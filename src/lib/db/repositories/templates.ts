@@ -10,3 +10,12 @@ export async function fetchActiveTemplateById(
     })
     .single();
 }
+
+export async function fetchActiveTemplatesForPlatform(
+  supabase: SupabaseClient,
+  platformCode: string
+) {
+  return supabase.rpc("get_active_templates", {
+    platform_code_input: platformCode,
+  });
+}

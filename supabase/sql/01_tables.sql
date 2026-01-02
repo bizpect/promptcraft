@@ -80,6 +80,7 @@ create table if not exists public.rewrites (
   user_id uuid not null references auth.users (id) on delete cascade,
   prompt_id uuid references public.prompts (id) on delete set null,
   rewritten_prompt text not null,
+  source_prompt text,
   provider_group text not null default 'rewrite_provider'
     check (provider_group = 'rewrite_provider'),
   provider_code text not null,

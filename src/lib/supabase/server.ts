@@ -14,9 +14,13 @@ export async function createServerSupabase() {
         return cookieStore.getAll();
       },
       setAll(cookieList) {
-        cookieList.forEach(({ name, value, options }) => {
-          cookieStore.set({ name, value, ...options });
-        });
+        try {
+          cookieList.forEach(({ name, value, options }) => {
+            cookieStore.set({ name, value, ...options });
+          });
+        } catch {
+          // Ignore when called from Server Components where cookies are read-only.
+        }
       },
     },
   });

@@ -36,6 +36,9 @@ export default async function AppLayout({
           <Link href="/app/billing" className="hover:text-orange-600">
             결제/플랜
           </Link>
+          <Link href="/app/profile" className="hover:text-orange-600">
+            프로필
+          </Link>
         </nav>
         <main className="rounded-2xl border border-black/10 bg-white p-6">
           {children}

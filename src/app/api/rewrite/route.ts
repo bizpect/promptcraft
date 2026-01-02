@@ -131,6 +131,7 @@ export async function POST(request: Request) {
   const { error: rewriteError } = await insertRewrite(supabase, {
     userId: user.id,
     promptId: prompt_id ?? null,
+    sourcePrompt: sourcePrompt,
     rewrittenPrompt: rewritten,
     providerCode: "openai",
     tokensIn: completion.usage?.prompt_tokens ?? null,
