@@ -1,12 +1,9 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-export function createBrowserSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { getSupabaseConfig } from "@/lib/supabase/config";
 
-  if (!url || !anonKey) {
-    throw new Error("Missing Supabase environment variables");
-  }
+export function createBrowserSupabase() {
+  const { url, anonKey } = getSupabaseConfig();
 
   return createBrowserClient(url, anonKey);
 }

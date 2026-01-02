@@ -1,13 +1,19 @@
 import Link from "next/link";
 
 import { requireUser } from "@/lib/auth/guard";
+import { UserMenu } from "@/components/auth/user-menu";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { fetchCurrentUserProfile } from "@/lib/db/repositories/users";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireUser();
+  const user = await requireUser("/app");
+  const supabase = await createServerSupabase();
+  const { data: profile } = await fetchCurrentUserProfile(supabase);
+  const userLabel = profile?.display_name ?? profile?.email ?? user.email;
 
   return (
     <div className="min-h-screen bg-white">
@@ -16,7 +22,7 @@ export default async function AppLayout({
           <Link href="/" className="text-lg font-semibold">
             PromptCraft
           </Link>
-          <div className="text-sm text-black/60">{user.email}</div>
+          <UserMenu email={userLabel} />
         </div>
       </header>
       <div className="mx-auto grid w-full max-w-6xl gap-6 px-6 py-8 md:grid-cols-[200px_1fr]">

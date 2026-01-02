@@ -3,8 +3,15 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
 import { errorResponse } from "@/lib/api/response";
+import {
+  fetchPromptOutputForUser,
+  fetchSubscriptionForUser,
+  insertRewrite,
+  updateSubscriptionRewriteUsed,
+} from "@/lib/db";
 import { MAX_REWRITE_INPUT, MAX_REWRITE_OUTPUT } from "@/lib/limits";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { logSupabaseError } from "@/lib/supabase/errors";
 
 const schema = z.object({
   prompt_id: z.string().optional(),
@@ -13,7 +20,7 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -39,17 +46,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const { data: subscription, error: subError } = await supabase
-    .from("subscriptions")
-    .select("plan, status, rewrite_used, rewrite_limit")
-    .eq("user_id", user.id)
-    .single();
+  const { data: subscription, error: subError } =
+    await fetchSubscriptionForUser(supabase);
 
   if (subError || !subscription) {
+    logSupabaseError("subscriptions.select", subError);
     return errorResponse("plan_required", "플랜 정보가 없습니다.", 403);
   }
 
-  if (subscription.status !== "active") {
+  if (subscription.status_code !== "active") {
     return errorResponse("inactive_plan", "활성 플랜이 아닙니다.", 403);
   }
 
@@ -60,14 +65,11 @@ export async function POST(request: Request) {
   let sourcePrompt = original_prompt ?? "";
 
   if (prompt_id) {
-    const { data: promptRow, error: promptError } = await supabase
-      .from("prompts")
-      .select("output_prompt")
-      .eq("id", prompt_id)
-      .eq("user_id", user.id)
-      .single();
+    const { data: promptRow, error: promptError } =
+      await fetchPromptOutputForUser(supabase, prompt_id);
 
     if (promptError || !promptRow) {
+      logSupabaseError("prompts.select", promptError);
       return errorResponse("prompt_not_found", "프롬프트를 찾을 수 없습니다.", 404);
     }
 
@@ -126,25 +128,27 @@ export async function POST(request: Request) {
     );
   }
 
-  const { error: rewriteError } = await supabase.from("rewrites").insert({
-    user_id: user.id,
-    prompt_id: prompt_id ?? null,
-    rewritten_prompt: rewritten,
-    provider: "openai",
-    tokens_in: completion.usage?.prompt_tokens ?? null,
-    tokens_out: completion.usage?.completion_tokens ?? null,
+  const { error: rewriteError } = await insertRewrite(supabase, {
+    userId: user.id,
+    promptId: prompt_id ?? null,
+    rewrittenPrompt: rewritten,
+    providerCode: "openai",
+    tokensIn: completion.usage?.prompt_tokens ?? null,
+    tokensOut: completion.usage?.completion_tokens ?? null,
   });
 
   if (rewriteError) {
+    logSupabaseError("rewrites.insert", rewriteError);
     return errorResponse("rewrite_failed", "리라이팅 저장에 실패했습니다.", 500);
   }
 
-  const { error: updateError } = await supabase
-    .from("subscriptions")
-    .update({ rewrite_used: subscription.rewrite_used + 1 })
-    .eq("user_id", user.id);
+  const { error: updateError } = await updateSubscriptionRewriteUsed(
+    supabase,
+    subscription.rewrite_used + 1
+  );
 
   if (updateError) {
+    logSupabaseError("subscriptions.update", updateError);
     return errorResponse("quota_update_failed", "쿼터 갱신에 실패했습니다.", 500);
   }
 

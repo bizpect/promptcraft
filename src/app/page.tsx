@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { PublicAuthLink } from "@/components/auth/public-auth-link";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
@@ -16,6 +17,7 @@ export default function HomePage() {
           <Link href="/pricing" className="hover:text-orange-600">
             요금제
           </Link>
+          <PublicAuthLink className="hover:text-orange-600" />
           <Link href="/app/builder" className="hover:text-orange-600">
             빌더
           </Link>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { PublicAuthLink } from "@/components/auth/public-auth-link";
 
 const plans = [
   {
@@ -34,6 +35,7 @@ export default function PricingPage() {
         <Link href="/" className="text-sm text-black/70">
           ← 홈으로
         </Link>
+        <PublicAuthLink className="text-sm text-black/70" />
         <h1 className="text-3xl font-semibold">요금제</h1>
         <p className="text-sm text-black/70">
           모든 플랜은 템플릿 빌더와 저장 기능을 제공합니다. Pro에서만

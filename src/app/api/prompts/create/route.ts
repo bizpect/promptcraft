@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { errorResponse } from "@/lib/api/response";
+import { fetchActiveTemplateById, insertPrompt } from "@/lib/db";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { logSupabaseError } from "@/lib/supabase/errors";
 import { formatForPlatform, renderBasePrompt } from "@/lib/templates/render";
 
 const schema = z.object({
@@ -11,7 +13,7 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -29,20 +31,17 @@ export async function POST(request: Request) {
 
   const { template_id, input_json } = parsed.data;
 
-  const { data: template, error: templateError } = await supabase
-    .from("templates")
-    .select("id, platform, base_prompt, title")
-    .eq("id", template_id)
-    .eq("is_active", true)
-    .single();
+  const { data: template, error: templateError } =
+    await fetchActiveTemplateById(supabase, template_id);
 
   if (templateError || !template) {
+    logSupabaseError("templates.select", templateError);
     return errorResponse("template_not_found", "템플릿을 찾을 수 없습니다.", 404);
   }
 
   const rendered = renderBasePrompt(template.base_prompt, input_json);
   const outputPrompt = formatForPlatform(
-    template.platform,
+    template.platform_code,
     rendered,
     input_json
   );
@@ -50,20 +49,19 @@ export async function POST(request: Request) {
   const titleSeed = input_json.scene || template.title || "Untitled";
   const title = titleSeed.slice(0, 40);
 
-  const { data: createdPrompt, error: insertError } = await supabase
-    .from("prompts")
-    .insert({
-      user_id: user.id,
-      template_id: template.id,
-      platform: template.platform,
+  const { data: createdPrompt, error: insertError } = await insertPrompt(
+    supabase,
+    {
+      templateId: template.id,
+      platformCode: template.platform_code,
       title,
-      input_json,
-      output_prompt: outputPrompt,
-    })
-    .select("id, output_prompt")
-    .single();
+      inputJson: input_json,
+      outputPrompt,
+    }
+  );
 
   if (insertError || !createdPrompt) {
+    logSupabaseError("prompts.insert", insertError);
     return errorResponse("insert_failed", "저장에 실패했습니다.", 500);
   }
 
