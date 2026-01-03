@@ -35,7 +35,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="relative mx-auto flex min-h-screen w-full max-w-xl flex-col gap-8 px-6 py-16">
+    <div className="page relative mx-auto flex min-h-screen w-full max-w-xl flex-col gap-8 px-6 py-16">
       <div className="pointer-events-none absolute -left-16 top-20 h-56 w-56 rounded-full bg-[var(--accent)]/20 blur-[120px] orb" />
       <header className="flex flex-col gap-3">
         <Link href="/" className="text-xs uppercase tracking-[0.3em] text-white/60">
