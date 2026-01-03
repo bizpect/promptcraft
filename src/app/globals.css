@@ -1,31 +1,67 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0b0d;
-  --foreground: #f5f5f7;
-  --accent: #ff8a00;
-  --surface: #151519;
-  --surface-2: #1c1c22;
-  --border: rgba(255, 255, 255, 0.08);
+  --background: #09090b;
+  --foreground: #f2f2f5;
+  --accent: #b6ff2a;
+  --accent-2: #56f2c4;
+  --surface: #121217;
+  --surface-2: #1a1a20;
+  --border: rgba(255, 255, 255, 0.1);
   --muted: rgba(255, 255, 255, 0.62);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: radial-gradient(circle at top, #1f1a12 0%, #0b0b0d 45%, #060607 100%);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(182, 255, 42, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(86, 242, 196, 0.12), transparent 40%),
+    linear-gradient(140deg, #09090b 0%, #0b0b0f 60%, #070708 100%);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  min-height: 100vh;
+  position: relative;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: -10px -10px;
+}
+
+.page > * {
+  animation: fade-up 420ms ease both;
+}
+
+.page > *:nth-child(2) { animation-delay: 60ms; }
+.page > *:nth-child(3) { animation-delay: 120ms; }
+.page > *:nth-child(4) { animation-delay: 180ms; }
+.page > *:nth-child(5) { animation-delay: 240ms; }
+.page > *:nth-child(6) { animation-delay: 300ms; }
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 input,
