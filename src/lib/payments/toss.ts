@@ -261,6 +261,7 @@ export async function revokeTossBillingKey(input: {
   const fallbackUrls = [
     `${apiBaseUrl}/billing/authorizations/${encodedBillingKey}`,
     `${apiBaseUrl}/billing/authorizations/${encodedBillingKey}/revoke`,
+    `${apiBaseUrl}/billing/authorizations/${encodedBillingKey}/cancel`,
   ];
 
   for (const url of fallbackUrls) {
@@ -270,7 +271,11 @@ export async function revokeTossBillingKey(input: {
     }
 
     const message =
-      typeof result.data.message === "string" ? result.data.message : "";
+      typeof result.data.message === "string"
+        ? result.data.message
+        : typeof result.data.code === "string"
+          ? result.data.code
+          : "";
     if (result.status !== 404 && message) {
       const error = new Error(message);
       (error as Error & { payload?: Record<string, unknown> }).payload =
@@ -279,7 +284,9 @@ export async function revokeTossBillingKey(input: {
     }
   }
 
-  const error = new Error("Toss billing key revoke failed");
+  const error = new Error(
+    primaryMessage || "Toss billing key revoke failed"
+  );
   (error as Error & { payload?: Record<string, unknown> }).payload =
     primary.data;
   throw error;
