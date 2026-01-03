@@ -1,5 +1,7 @@
 import type { PostgrestResponse, SupabaseClient } from "@supabase/supabase-js";
 
+import type { RpcArrayResult } from "@/lib/db/repositories/types";
+
 type ActiveTemplate = {
   id: string;
   platform_code: "sora" | "veo";
@@ -22,15 +24,15 @@ export async function fetchActiveTemplateById(
     .rpc("get_active_template", {
       template_id: templateId,
     })
-    .returns<ActiveTemplate[]>()
+    .returns<ActiveTemplate>()
     .single();
 }
 
 export async function fetchActiveTemplatesForPlatform(
   supabase: SupabaseClient,
   platformCode: string
-): Promise<PostgrestResponse<ActiveTemplateListItem>> {
+): Promise<PostgrestResponse<RpcArrayResult<ActiveTemplateListItem>>> {
   return supabase.rpc("get_active_templates", {
     platform_code_input: platformCode,
-  }).returns<ActiveTemplateListItem>();
+  }).returns<ActiveTemplateListItem[]>();
 }

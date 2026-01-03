@@ -80,7 +80,7 @@ Deno.serve(async () => {
     .rpc("get_due_subscriptions_for_billing", {
       cutoff,
     })
-    .returns<DueSubscription>();
+    .returns<DueSubscription[]>();
 
   if (error) {
     return new Response(JSON.stringify({ ok: false, error }), {
@@ -91,7 +91,9 @@ Deno.serve(async () => {
 
   const results: Record<string, unknown>[] = [];
 
-  for (const subscription of dueSubscriptions ?? []) {
+  const dueList = Array.isArray(dueSubscriptions) ? dueSubscriptions : [];
+
+  for (const subscription of dueList) {
     const orderId = `sub_${subscription.plan_code}_${crypto.randomUUID()}`;
     const orderName = `PromptCraft ${subscription.plan_code.toUpperCase()}`;
 
