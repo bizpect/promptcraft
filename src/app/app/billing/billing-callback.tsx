@@ -121,13 +121,13 @@ export function BillingCallback({
     router,
   ]);
 
-  if (!status) {
-    return null;
-  }
-
   useEffect(() => {
     bannerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [status]);
+
+  if (!status) {
+    return null;
+  }
 
   const toneStyles =
     status.tone === "success"
