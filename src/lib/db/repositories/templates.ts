@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PostgrestResponse, SupabaseClient } from "@supabase/supabase-js";
 
 type ActiveTemplate = {
   id: string;
@@ -29,8 +29,8 @@ export async function fetchActiveTemplateById(
 export async function fetchActiveTemplatesForPlatform(
   supabase: SupabaseClient,
   platformCode: string
-) {
+): Promise<PostgrestResponse<ActiveTemplateListItem>> {
   return supabase.rpc("get_active_templates", {
     platform_code_input: platformCode,
-  }).returns<ActiveTemplateListItem[]>();
+  }).returns<ActiveTemplateListItem>();
 }

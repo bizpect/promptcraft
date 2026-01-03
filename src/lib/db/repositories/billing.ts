@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PostgrestResponse, SupabaseClient } from "@supabase/supabase-js";
 
 type BillingProfileInput = {
   providerCode: string;
@@ -109,10 +109,10 @@ export async function fetchSubscriptionPlanDetail(
 export async function fetchDueSubscriptionsForBilling(
   supabase: SupabaseClient,
   cutoff: string
-) {
+): Promise<PostgrestResponse<DueSubscription>> {
   return supabase.rpc("get_due_subscriptions_for_billing", {
     cutoff,
-  }).returns<DueSubscription[]>();
+  }).returns<DueSubscription>();
 }
 
 export async function applyBillingChargeSuccess(

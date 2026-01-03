@@ -80,7 +80,7 @@ Deno.serve(async () => {
     .rpc("get_due_subscriptions_for_billing", {
       cutoff,
     })
-    .returns<DueSubscription[]>();
+    .returns<DueSubscription>();
 
   if (error) {
     return new Response(JSON.stringify({ ok: false, error }), {

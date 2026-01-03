@@ -75,7 +75,7 @@ export async function insertPrompt(
 export async function fetchUserPrompts(
   supabase: SupabaseClient
 ): Promise<PostgrestResponse<PromptListItem>> {
-  return supabase.rpc("get_user_prompts").returns<PromptListItem[]>();
+  return supabase.rpc("get_user_prompts").returns<PromptListItem>();
 }
 
 export async function fetchPromptDetailForUser(
