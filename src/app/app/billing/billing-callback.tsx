@@ -12,6 +12,7 @@ type BillingCallbackProps = {
   planCode?: string;
   result?: string;
   orderId?: string;
+  mode?: string;
 };
 
 function normalizePlanCode(value: string | null | undefined) {
@@ -28,6 +29,7 @@ export function BillingCallback({
   planCode,
   result,
   orderId,
+  mode,
 }: BillingCallbackProps) {
   const [status, setStatus] = useState<{
     message: string;
@@ -47,6 +49,7 @@ export function BillingCallback({
   const resolvedResult = result ?? searchParams.get("result");
   const resolvedPlanCode = planCode ?? searchParams.get("plan");
   const resolvedOrderId = orderId ?? searchParams.get("orderId");
+  const resolvedMode = mode ?? searchParams.get("mode");
 
   useEffect(() => {
     if (!resolvedAuthKey || !resolvedCustomerKey) {
@@ -106,6 +109,37 @@ export function BillingCallback({
 
     lastRequestKeyRef.current = requestKey;
 
+    const sendUpdate = async () => {
+      setStatus({
+        message: "새 결제수단을 등록하는 중...",
+        tone: "info",
+      });
+
+      const response = await fetch("/api/payments/toss/billing/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auth_key: resolvedAuthKey,
+          customer_key: resolvedCustomerKey,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setStatus({
+          message: data.message || "결제수단 변경에 실패했습니다.",
+          tone: "error",
+        });
+        return;
+      }
+
+      setStatus({
+        message: "결제수단이 변경되었습니다.",
+        tone: "success",
+      });
+      router.refresh();
+    };
+
     const sendIssue = async () => {
       setStatus({
         message: "빌링키를 발급하고 결제를 확인하는 중...",
@@ -139,13 +173,18 @@ export function BillingCallback({
       router.refresh();
     };
 
-    void sendIssue();
+    if (resolvedMode === "update") {
+      void sendUpdate();
+    } else {
+      void sendIssue();
+    }
   }, [
     resolvedAuthKey,
     resolvedCustomerKey,
     resolvedResult,
     resolvedPlanCode,
     resolvedOrderId,
+    resolvedMode,
     router,
   ]);
 

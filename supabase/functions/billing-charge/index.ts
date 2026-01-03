@@ -70,6 +70,7 @@ async function chargeBillingKey(input: {
 Deno.serve(async () => {
   const supabaseUrl = getEnv("SB_URL");
   const serviceRoleKey = getEnv("SB_SERVICE_ROLE_KEY");
+  const maxRetryAttempts = 3;
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -155,17 +156,33 @@ Deno.serve(async () => {
           ? (error as Error & { payload?: Record<string, unknown> }).payload
           : null;
 
-      const { error: failError } = await supabase
-        .rpc("apply_billing_charge_failure", {
+      const { data: failureCount } = await supabase
+        .rpc("get_billing_failure_count", {
           user_id_input: subscription.user_id,
-          order_id_input: orderId,
-          payment_key_input: null,
-          amount_input: subscription.price,
-          currency_input: subscription.currency,
-          raw_response_input: payload ?? {},
-          plan_code_input: subscription.plan_code,
+          since_input: subscription.current_period_end,
           provider_code_input: "toss",
         })
+        .single();
+
+      const attempts = typeof failureCount === "number" ? failureCount + 1 : 1;
+      const shouldDeactivate = attempts >= maxRetryAttempts;
+
+      const { error: failError } = await supabase
+        .rpc(
+          shouldDeactivate
+            ? "apply_billing_charge_failure"
+            : "apply_billing_charge_failure_retry",
+          {
+            user_id_input: subscription.user_id,
+            order_id_input: orderId,
+            payment_key_input: null,
+            amount_input: subscription.price,
+            currency_input: subscription.currency,
+            raw_response_input: payload ?? {},
+            plan_code_input: subscription.plan_code,
+            provider_code_input: "toss",
+          }
+        )
         .single();
 
       results.push({
@@ -173,6 +190,8 @@ Deno.serve(async () => {
         status: "failed",
         order_id: orderId,
         error: failError ?? payload ?? String(error),
+        attempts,
+        deactivated: shouldDeactivate,
       });
     }
   }

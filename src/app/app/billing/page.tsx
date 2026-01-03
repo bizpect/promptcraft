@@ -4,6 +4,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 
 import { BillingActions } from "@/app/app/billing/billing-actions";
 import { BillingCallback } from "@/app/app/billing/billing-callback";
+import { PaymentMethodActions } from "@/app/app/billing/payment-method-actions";
 import { SubscriptionActions } from "@/app/app/billing/subscription-actions";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ type SearchParams = {
   customer_key?: string;
   plan?: string;
   orderId?: string;
+  mode?: string;
 };
 
 export default async function BillingPage({
@@ -46,6 +48,8 @@ export default async function BillingPage({
   const latestStatusLabel = latestPayment?.status_label ?? latestStatusCode;
   const hasLatestFailure =
     latestStatusCode === "failed" || latestStatusCode === "canceled";
+  const canRetry =
+    hasLatestFailure && subscription?.status_code === "active";
 
   const formatDate = (value: string | null) => {
     if (!value) {
@@ -72,6 +76,23 @@ export default async function BillingPage({
 
     return `${amount.toLocaleString("ko-KR")} ${resolvedCurrency}`;
   };
+
+  const formatDaysLeft = (value: string | null) => {
+    if (!value) {
+      return null;
+    }
+
+    const target = new Date(value).getTime();
+    if (Number.isNaN(target)) {
+      return null;
+    }
+
+    const diffMs = target - Date.now();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return Number.isFinite(daysLeft) ? daysLeft : null;
+  };
+
+  const cancelDaysLeft = formatDaysLeft(cancelAt);
 
   return (
     <div className="space-y-6">
@@ -100,6 +121,13 @@ export default async function BillingPage({
             <p className="text-black/60">
               만료일: {formatDate(currentPeriodEnd)}
             </p>
+            {cancelAt && (
+              <p className="text-xs text-black/60">
+                {cancelDaysLeft !== null && cancelDaysLeft > 0
+                  ? `해지 예정 · ${formatDate(cancelAt)} (D-${cancelDaysLeft})`
+                  : "구독 만료됨"}
+              </p>
+            )}
           </div>
           <SubscriptionActions
             currentStatusCode={subscription?.status_code ?? null}
@@ -126,12 +154,18 @@ export default async function BillingPage({
         )}
       </div>
 
+      <PaymentMethodActions
+        currentPlanCode={subscription?.plan_code ?? null}
+        currentStatusCode={subscription?.status_code ?? null}
+      />
+
       <BillingCallback
         authKey={authKey}
         customerKey={customerKey}
         planCode={planCode}
         result={result}
         orderId={orderId}
+        mode={searchParams?.mode}
       />
 
       <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
@@ -156,6 +190,12 @@ export default async function BillingPage({
             </span>
           )}
         </div>
+        {canRetry && (
+          <p className="mt-2 text-xs text-amber-700">
+            자동으로 다시 시도합니다. 실패가 반복되면 구독이 비활성화될 수
+            있습니다.
+          </p>
+        )}
         <div className="mt-3 space-y-3">
           {payments.length > 0 ? (
             payments.slice(0, 5).map((payment) => {

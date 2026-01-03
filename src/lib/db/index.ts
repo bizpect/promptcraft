@@ -41,3 +41,8 @@ export {
   updateCurrentUserProfile,
   insertLoginEvent,
 } from "@/lib/db/repositories/users";
+export {
+  fetchAdminPlanTotals,
+  fetchAdminRecentPayments,
+  fetchAdminSubscriptionTotals,
+} from "@/lib/db/repositories/admin";

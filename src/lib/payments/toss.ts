@@ -21,6 +21,17 @@ type TossBillingKeyResponse = {
   card?: { number?: string } | null;
 };
 
+export function extractCardSummary(response: Record<string, unknown>) {
+  const card = response.card as Record<string, unknown> | undefined;
+  const number = card?.number;
+
+  if (typeof number === "string" && number.trim().length > 0) {
+    return number;
+  }
+
+  return null;
+}
+
 export function getTossConfig(): TossConfig {
   const clientKey = process.env.TOSS_CLIENT_KEY;
   const secretKey = process.env.TOSS_SECRET_KEY;

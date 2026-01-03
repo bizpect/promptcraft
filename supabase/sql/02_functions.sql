@@ -846,6 +846,144 @@ begin
 end;
 $$;
 
+create or replace function public.apply_billing_charge_failure_retry(
+  user_id_input uuid,
+  order_id_input text,
+  payment_key_input text,
+  amount_input integer,
+  currency_input text,
+  raw_response_input jsonb,
+  plan_code_input text,
+  provider_code_input text default 'toss'
+)
+returns table (
+  payment_id uuid,
+  status_code text
+) language plpgsql security invoker as $$
+declare
+  inserted_payment_id uuid;
+begin
+  if auth.uid() is null and auth.role() <> 'service_role' then
+    raise exception 'not allowed';
+  end if;
+
+  insert into public.payments (
+    user_id,
+    provider_code,
+    status_code,
+    order_id,
+    payment_key,
+    amount,
+    currency,
+    raw_response,
+    updated_at
+  )
+  values (
+    user_id_input,
+    provider_code_input,
+    'failed',
+    order_id_input,
+    payment_key_input,
+    amount_input,
+    coalesce(currency_input, 'KRW'),
+    coalesce(raw_response_input, '{}'::jsonb),
+    now()
+  )
+  on conflict (provider_group, provider_code, order_id) do update
+    set payment_key = excluded.payment_key,
+        status_code = 'failed',
+        amount = excluded.amount,
+        currency = excluded.currency,
+        raw_response = excluded.raw_response,
+        updated_at = now()
+  returning id into inserted_payment_id;
+
+  return query
+  select inserted_payment_id, 'failed';
+end;
+$$;
+
+create or replace function public.get_billing_failure_count(
+  user_id_input uuid,
+  since_input timestamptz,
+  provider_code_input text default 'toss'
+)
+returns integer language sql security invoker as $$
+  select count(*)
+  from public.payments as p
+  where p.user_id = user_id_input
+    and p.provider_code = provider_code_input
+    and p.status_code = 'failed'
+    and (since_input is null or p.created_at >= since_input);
+$$;
+
+create or replace function public.get_admin_subscription_totals()
+returns table (
+  status_code text,
+  total bigint
+) language plpgsql security invoker as $$
+begin
+  if auth.role() <> 'service_role' then
+    raise exception 'not allowed';
+  end if;
+
+  return query
+  select s.status_code, count(*)
+  from public.subscriptions as s
+  group by s.status_code
+  order by s.status_code;
+end;
+$$;
+
+create or replace function public.get_admin_plan_totals()
+returns table (
+  plan_code text,
+  total bigint
+) language plpgsql security invoker as $$
+begin
+  if auth.role() <> 'service_role' then
+    raise exception 'not allowed';
+  end if;
+
+  return query
+  select s.plan_code, count(*)
+  from public.subscriptions as s
+  group by s.plan_code
+  order by s.plan_code;
+end;
+$$;
+
+create or replace function public.get_admin_recent_payments(limit_input integer default 20)
+returns table (
+  id uuid,
+  user_id uuid,
+  provider_code text,
+  status_code text,
+  amount integer,
+  currency text,
+  order_id text,
+  created_at timestamptz
+) language plpgsql security invoker as $$
+begin
+  if auth.role() <> 'service_role' then
+    raise exception 'not allowed';
+  end if;
+
+  return query
+  select p.id,
+    p.user_id,
+    p.provider_code,
+    p.status_code,
+    p.amount,
+    p.currency,
+    p.order_id,
+    p.created_at
+  from public.payments as p
+  order by p.created_at desc
+  limit coalesce(limit_input, 20);
+end;
+$$;
+
 create or replace function public.apply_billing_key_revoked(
   customer_key_input text,
   billing_key_input text

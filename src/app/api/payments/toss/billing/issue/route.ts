@@ -11,6 +11,7 @@ import {
 } from "@/lib/db";
 import {
   chargeTossBillingKey,
+  extractCardSummary,
   issueTossBillingKey,
 } from "@/lib/payments/toss";
 import { logSupabaseError } from "@/lib/supabase/errors";
@@ -30,17 +31,6 @@ const planSchema = z.object({
   currency: z.string().optional(),
   rewrite_limit: z.number().int().optional(),
 });
-
-function extractCardSummary(response: Record<string, unknown>) {
-  const card = response.card as Record<string, unknown> | undefined;
-  const number = card?.number;
-
-  if (typeof number === "string" && number.trim().length > 0) {
-    return number;
-  }
-
-  return null;
-}
 
 export async function POST(request: Request) {
   const supabase = await createServerSupabase();

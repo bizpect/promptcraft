@@ -21,10 +21,15 @@ export function getAppBaseUrl() {
   return normalizeBaseUrl(baseUrl);
 }
 
-export function getBillingRedirectUrls(planCode: string, orderId: string) {
+export function getBillingRedirectUrls(
+  planCode: string,
+  orderId: string,
+  mode: "subscribe" | "update" = "subscribe"
+) {
   const baseUrl = getAppBaseUrl();
-  const successUrl = `${baseUrl}${DEFAULT_SUCCESS_PATH}?result=success&plan=${planCode}&orderId=${orderId}`;
-  const failUrl = `${baseUrl}${DEFAULT_SUCCESS_PATH}?result=fail&plan=${planCode}&orderId=${orderId}`;
+  const modeParam = mode === "update" ? "&mode=update" : "";
+  const successUrl = `${baseUrl}${DEFAULT_SUCCESS_PATH}?result=success&plan=${planCode}&orderId=${orderId}${modeParam}`;
+  const failUrl = `${baseUrl}${DEFAULT_SUCCESS_PATH}?result=fail&plan=${planCode}&orderId=${orderId}${modeParam}`;
 
   return { successUrl, failUrl };
 }

@@ -11,6 +11,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 
 const schema = z.object({
   plan_code: z.enum(["pro", "max"]),
+  mode: z.enum(["subscribe", "update"]).optional(),
 });
 
 const planSchema = z.object({
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     return errorResponse("invalid_input", "입력값이 올바르지 않습니다.", 400);
   }
 
-  const { plan_code } = parsed.data;
+  const { plan_code, mode } = parsed.data;
   const { data: plan, error } = await fetchSubscriptionPlanDetail(
     supabase,
     plan_code
@@ -56,12 +57,23 @@ export async function POST(request: Request) {
   }
 
   const { clientKey } = getTossConfig();
-  const orderId = `billing_auth_${plan_code}_${randomUUID()}`;
-  const orderName = `PromptCraft ${
-    parsedPlan.data.plan_label ?? parsedPlan.data.plan_code ?? plan_code
-  }`;
+  const resolvedMode = mode ?? "subscribe";
+  const orderId =
+    resolvedMode === "update"
+      ? `billing_update_${plan_code}_${randomUUID()}`
+      : `billing_auth_${plan_code}_${randomUUID()}`;
+  const orderName =
+    resolvedMode === "update"
+      ? `PromptCraft ${parsedPlan.data.plan_label ?? plan_code} 결제수단 변경`
+      : `PromptCraft ${
+          parsedPlan.data.plan_label ?? parsedPlan.data.plan_code ?? plan_code
+        }`;
   const amount = parsedPlan.data.price ?? 0;
-  const { successUrl, failUrl } = getBillingRedirectUrls(plan_code, orderId);
+  const { successUrl, failUrl } = getBillingRedirectUrls(
+    plan_code,
+    orderId,
+    resolvedMode
+  );
 
   return NextResponse.json({
     client_key: clientKey,

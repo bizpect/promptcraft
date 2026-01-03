@@ -34,6 +34,7 @@ cp .env.example .env.local
 - `TOSS_WEBHOOK_SECRET`: 토스 웹훅 서명 시크릿
 - `TOSS_API_BASE_URL`: 기본 `https://api.tosspayments.com/v1` (선택)
 - `CRON_SECRET`: `/api/cron/billing-charge` 보호용 시크릿
+- `ADMIN_EMAILS`: 운영 대시보드 접근 허용 이메일(콤마 구분)
 
 ## Supabase Billing Cron
 
