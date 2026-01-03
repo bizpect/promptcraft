@@ -2,14 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 type ActiveTemplate = {
   id: string;
-  platform_code: string;
+  platform_code: "sora" | "veo";
   base_prompt: string;
   title: string;
 };
 
 type ActiveTemplateListItem = {
   id: string;
-  platform_code: string;
+  platform_code: "sora" | "veo";
   title: string;
   description: string | null;
 };
