@@ -35,26 +35,34 @@ function LoginContent() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-xl flex-col gap-8 px-6 py-16">
+    <div className="relative mx-auto flex min-h-screen w-full max-w-xl flex-col gap-8 px-6 py-16">
+      <div className="pointer-events-none absolute -left-16 top-20 h-56 w-56 rounded-full bg-[var(--accent)]/20 blur-[120px] orb" />
       <header className="flex flex-col gap-3">
-        <Link href="/" className="text-sm text-black/70">
+        <Link href="/" className="text-xs uppercase tracking-[0.3em] text-white/60">
           ← 홈으로
         </Link>
-        <h1 className="text-3xl font-semibold">로그인</h1>
-        <p className="text-sm text-black/70">
+        <h1 className="text-3xl font-semibold text-white md:text-4xl font-[var(--font-playfair)]">
+          로그인
+        </h1>
+        <p className="text-sm text-white/65">
           구글 계정으로 빠르게 시작하세요. 로그인 후 대시보드로 이동합니다.
         </p>
       </header>
 
-      <button
-        type="button"
-        onClick={handleGoogleLogin}
-        className={buttonVariants({ variant: "default" })}
-        disabled={loading}
-      >
-        {loading && <LoadingSpinner size={16} />}
-        Google로 계속하기
-      </button>
+      <div className="grid gap-4 rounded-[26px] border border-white/10 bg-[var(--surface)]/80 p-6 shadow-[0_40px_120px_rgba(0,0,0,0.6)]">
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className={buttonVariants({ variant: "default" })}
+          disabled={loading}
+        >
+          {loading && <LoadingSpinner size={16} />}
+          Google로 계속하기
+        </button>
+        <p className="text-xs text-white/50">
+          로그인 시 PromptCraft의 서비스 약관 및 개인정보 처리방침에 동의합니다.
+        </p>
+      </div>
       <LoadingOverlay show={loading} />
     </div>
   );
