@@ -1,4 +1,5 @@
 import type {
+  PostgrestMaybeSingleResponse,
   PostgrestResponse,
   PostgrestSingleResponse,
   SupabaseClient,
@@ -86,8 +87,13 @@ type PaymentAttemptInput = {
   metadata?: Record<string, unknown>;
 };
 
-export async function fetchBillingProfile(supabase: SupabaseClient) {
-  return supabase.rpc("get_billing_profile").returns<BillingProfile>().maybeSingle();
+export async function fetchBillingProfile(
+  supabase: SupabaseClient
+): Promise<PostgrestMaybeSingleResponse<BillingProfile>> {
+  return supabase
+    .rpc("get_billing_profile")
+    .returns<BillingProfile>()
+    .maybeSingle();
 }
 
 export async function upsertBillingProfile(
