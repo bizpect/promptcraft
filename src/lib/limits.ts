@@ -1,2 +1,2 @@
 export const MAX_REWRITE_INPUT = 1200;
-export const MAX_REWRITE_OUTPUT = 600;
+export const MAX_REWRITE_OUTPUT = 2000;
