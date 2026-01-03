@@ -1,4 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type {
+  PostgrestMaybeSingleResponse,
+  PostgrestSingleResponse,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 
 type UserProfile = {
   id: string;
@@ -8,7 +12,9 @@ type UserProfile = {
   updated_at: string;
 };
 
-export async function fetchCurrentUserProfile(supabase: SupabaseClient) {
+export async function fetchCurrentUserProfile(
+  supabase: SupabaseClient
+): Promise<PostgrestMaybeSingleResponse<UserProfile>> {
   return supabase
     .rpc("get_current_user_profile")
     .returns<UserProfile>()
@@ -21,7 +27,7 @@ export async function updateCurrentUserProfile(
     displayName: string | null;
     avatarUrl: string | null;
   }
-) {
+): Promise<PostgrestSingleResponse<UserProfile>> {
   return supabase
     .rpc("update_current_user_profile", {
       display_name_input: input.displayName,
