@@ -62,6 +62,10 @@ supabase secrets set \
 - `/api/cron/billing-charge` 호출 시 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>` 필요
 - `CRON_SECRET` 환경 변수를 추가하세요.
 
+- 5) GitHub Actions 스케줄(권장)
+- `.github/workflows/billing-cron.yml` 사용
+- GitHub Secrets에 `CRON_SECRET`, `CRON_URL` 등록
+
 5) Toss 웹훅 서명 검증
 - 헤더 `tosspayments-webhook-signature`, `tosspayments-webhook-transmission-time` 기준으로 HMAC SHA-256 검증
 
