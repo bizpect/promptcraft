@@ -25,7 +25,7 @@ cp .env.example .env.local
 
 추가로 아래 환경 변수가 필요합니다.
 
-- `NEXT_PUBLIC_APP_URL`: 앱 베이스 URL (예: `https://promptcraft...vercel.app`)
+- `NEXT_PUBLIC_APP_URL`: 앱 베이스 URL (예: `https://promptcraft-orcin.vercel.app`)
 - `NEXT_PUBLIC_SB_URL`: Supabase 프로젝트 URL
 - `NEXT_PUBLIC_SB_ANON_KEY`: Supabase anon key
 - `SB_SERVICE_ROLE_KEY`: Supabase service role key
