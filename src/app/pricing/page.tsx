@@ -55,11 +55,6 @@ export default function PricingPage() {
               index === 1 ? "pt-10 shadow-[0_20px_60px_rgba(242,180,92,0.2)]" : ""
             }`}
           >
-            {index === 1 && (
-              <span className="absolute left-4 top-4 rounded-full border border-white/15 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-white/70">
-                Recommended
-              </span>
-            )}
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold text-white">
