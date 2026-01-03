@@ -1,19 +1,9 @@
-const TOKEN_MAP = [
-  "scene",
-  "characters",
-  "action",
-  "camera",
-  "constraints",
-] as const;
-
-export type TemplateInput = Partial<Record<(typeof TOKEN_MAP)[number], string>> &
-  Record<string, string>;
+export type TemplateInput = Record<string, string>;
 
 export function renderBasePrompt(basePrompt: string, input: TemplateInput) {
-  return TOKEN_MAP.reduce((result, key) => {
-    const value = input[key] ?? "";
-    return result.replaceAll(`{{${key}}}`, value);
-  }, basePrompt);
+  return basePrompt.replace(/{{\s*([\w-]+)\s*}}/g, (_, key: string) => {
+    return input[key] ?? "";
+  });
 }
 
 export function formatForPlatform(
