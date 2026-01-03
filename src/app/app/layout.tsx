@@ -13,7 +13,8 @@ export default async function AppLayout({
   const user = await requireUser("/app");
   const supabase = await createServerSupabase();
   const { data: profile } = await fetchCurrentUserProfile(supabase);
-  const userLabel = profile?.display_name ?? profile?.email ?? user.email;
+  const userLabel =
+    profile?.display_name ?? profile?.email ?? user.email ?? null;
 
   return (
     <div className="min-h-screen bg-white">
