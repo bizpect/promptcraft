@@ -36,3 +36,14 @@ export async function updateCurrentUserProfile(
     .returns<UserProfile>()
     .single();
 }
+
+export async function insertLoginEvent(
+  supabase: SupabaseClient,
+  input: {
+    loginType: string;
+  }
+): Promise<PostgrestSingleResponse<null>> {
+  return supabase.rpc("record_login_event", {
+    login_type_input: input.loginType,
+  });
+}

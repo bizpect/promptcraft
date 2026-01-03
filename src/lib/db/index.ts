@@ -35,4 +35,5 @@ export { fetchRewritesForPrompt } from "@/lib/db/repositories/rewrites";
 export {
   fetchCurrentUserProfile,
   updateCurrentUserProfile,
+  insertLoginEvent,
 } from "@/lib/db/repositories/users";

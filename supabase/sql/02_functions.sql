@@ -2,12 +2,20 @@
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.users (id, email, display_name, avatar_url)
+  insert into public.users (id, email, display_name, avatar_url, login_type_group, login_type)
   values (
     new.id,
     new.email,
     coalesce(new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'full_name'),
-    new.raw_user_meta_data->>'avatar_url'
+    new.raw_user_meta_data->>'avatar_url',
+    'login_provider',
+    case lower(new.raw_app_meta_data->>'provider')
+      when 'google' then 'G'
+      when 'tiktok' then 'T'
+      when 'kakao' then 'K'
+      when 'facebook' then 'F'
+      else null
+    end
   )
   on conflict (id) do nothing;
 
@@ -758,6 +766,36 @@ $$;
 
 
 -- Users
+create or replace function public.record_login_event(login_type_input text)
+returns void language plpgsql security invoker as $$
+declare
+  resolved_login_type text := login_type_input;
+begin
+  if resolved_login_type is null then
+    return;
+  end if;
+
+  if not exists (
+    select 1
+    from public.common_codes as c
+    where c.code_group = 'login_provider'
+      and c.code = resolved_login_type
+  ) then
+    return;
+  end if;
+
+  insert into public.login_logs (user_id, login_type_group, login_type)
+  values (auth.uid(), 'login_provider', resolved_login_type);
+
+  update public.users
+  set
+    login_type_group = 'login_provider',
+    login_type = resolved_login_type,
+    updated_at = now()
+  where id = auth.uid();
+end;
+$$;
+
 create or replace function public.get_current_user_profile()
 returns table (
   id uuid,

@@ -3,8 +3,26 @@ create table if not exists public.users (
   email text unique,
   display_name text,
   avatar_url text,
+  login_type_group text not null default 'login_provider'
+    check (login_type_group = 'login_provider'),
+  login_type text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint users_login_type_fk
+    foreign key (login_type_group, login_type)
+    references public.common_codes (code_group, code)
+);
+
+create table if not exists public.login_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  login_type_group text not null default 'login_provider'
+    check (login_type_group = 'login_provider'),
+  login_type text not null,
+  created_at timestamptz not null default now(),
+  constraint login_logs_login_type_fk
+    foreign key (login_type_group, login_type)
+    references public.common_codes (code_group, code)
 );
 
 create table if not exists public.common_codes (

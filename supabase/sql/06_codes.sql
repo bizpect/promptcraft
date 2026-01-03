@@ -9,6 +9,10 @@ values
   ('subscription_status', 'inactive', 'Inactive', 2, '{}'::jsonb),
   ('subscription_status', 'canceled', 'Canceled', 3, '{}'::jsonb),
   ('rewrite_provider', 'openai', 'OpenAI', 1, '{}'::jsonb),
+  ('login_provider', 'G', 'Google', 1, '{}'::jsonb),
+  ('login_provider', 'T', 'TikTok', 2, '{}'::jsonb),
+  ('login_provider', 'K', 'Kakao', 3, '{}'::jsonb),
+  ('login_provider', 'F', 'Facebook', 4, '{}'::jsonb),
   ('payment_provider', 'toss', 'Toss Payments', 1, '{}'::jsonb),
   ('payment_status', 'pending', 'Pending', 1, '{}'::jsonb),
   ('payment_status', 'paid', 'Paid', 2, '{}'::jsonb),
@@ -17,10 +21,4 @@ values
   ('billing_status', 'active', 'Active', 1, '{}'::jsonb),
   ('billing_status', 'inactive', 'Inactive', 2, '{}'::jsonb),
   ('billing_status', 'revoked', 'Revoked', 3, '{}'::jsonb)
-on conflict (code_group, code) do update
-  set
-    label = excluded.label,
-    sort_order = excluded.sort_order,
-    metadata = excluded.metadata,
-    is_active = true,
-    updated_at = now();
+;

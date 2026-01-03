@@ -1,4 +1,5 @@
 alter table public.users enable row level security;
+alter table public.login_logs enable row level security;
 alter table public.common_codes enable row level security;
 alter table public.subscriptions enable row level security;
 alter table public.billing_profiles enable row level security;
@@ -19,7 +20,18 @@ create policy "users_update_own"
   using (id = auth.uid())
   with check (id = auth.uid());
 
+create policy "login_logs_select_own"
+  on public.login_logs
+  for select
+  using (user_id = auth.uid());
+
+create policy "login_logs_insert_own"
+  on public.login_logs
+  for insert
+  with check (user_id = auth.uid());
+
 grant select, update on public.users to authenticated;
+grant select, insert on public.login_logs to authenticated;
 grant select on public.common_codes to anon, authenticated;
 grant select on public.templates to anon, authenticated;
 grant select, update on public.subscriptions to authenticated;
