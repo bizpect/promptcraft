@@ -6,15 +6,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
+import { formatForPlatform, renderBasePrompt } from "@/lib/templates/render";
 
 const formSchema = z.object({
   templateId: z.string().min(1, "템플릿을 선택하세요."),
   platform: z.enum(["sora", "veo"]),
-  scene: z.string().min(1, "장면을 입력하세요."),
-  characters: z.string().optional(),
-  action: z.string().min(1, "액션을 입력하세요."),
-  camera: z.string().optional(),
-  constraints: z.string().optional(),
+  inputs: z.record(z.string()).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -31,6 +28,7 @@ type TemplateOption = {
   title: string;
   description: string | null;
   platform_code: "sora" | "veo";
+  base_prompt: string;
 };
 
 type Subscription = {
@@ -41,6 +39,99 @@ type Subscription = {
   rewrite_used: number;
   rewrite_limit: number;
 };
+
+const LABEL_MAP: Record<string, string> = {
+  subject: "주제",
+  scene: "장면",
+  location: "장소",
+  lighting: "조명",
+  mood: "분위기",
+  camera: "카메라",
+  action: "액션",
+  characters: "캐릭터",
+  product: "제품",
+  background: "배경",
+  style: "스타일",
+  detail: "디테일",
+  timeline: "타임라인",
+  constraints: "제약 조건",
+};
+
+const TEXTAREA_KEYS = new Set([
+  "scene",
+  "action",
+  "constraints",
+  "timeline",
+  "detail",
+]);
+
+function extractTokens(basePrompt: string) {
+  const tokens = new Set<string>();
+  const regex = /{{\s*([\w-]+)\s*}}/g;
+  let match = regex.exec(basePrompt);
+
+  while (match) {
+    tokens.add(match[1]);
+    match = regex.exec(basePrompt);
+  }
+
+  return Array.from(tokens);
+}
+
+function buildPreview(input: {
+  platform: "sora" | "veo";
+  basePrompt: string;
+  inputs: Record<string, string>;
+}) {
+  const rendered = renderBasePrompt(input.basePrompt, input.inputs);
+  return formatForPlatform(input.platform, rendered, input.inputs);
+}
+
+function renderInputFields(input: {
+  platform: "sora" | "veo";
+  tokens: string[];
+  register: ReturnType<typeof useForm<FormValues>>["register"];
+}) {
+  const extras =
+    input.platform === "veo" ? ["timeline", "constraints"] : [];
+  const keys = Array.from(new Set([...input.tokens, ...extras]));
+
+  if (keys.length === 0) {
+    return (
+      <p className="text-xs text-black/50">
+        템플릿에 입력 키가 없습니다.
+      </p>
+    );
+  }
+
+  return (
+    <div className="grid gap-3">
+      {keys.map((key) => {
+        const label = LABEL_MAP[key] ?? key;
+        const isTextarea = TEXTAREA_KEYS.has(key);
+
+        return (
+          <label key={key} className="grid gap-2 text-xs text-black/60">
+            <span className="text-sm font-medium text-black/80">{label}</span>
+            {isTextarea ? (
+              <textarea
+                className="min-h-[70px] rounded-md border border-black/10 px-3 py-2 text-sm text-black"
+                placeholder={key}
+                {...input.register(`inputs.${key}`)}
+              />
+            ) : (
+              <input
+                className="h-10 rounded-md border border-black/10 px-3 text-sm text-black"
+                placeholder={key}
+                {...input.register(`inputs.${key}`)}
+              />
+            )}
+          </label>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function BuilderPage() {
   const [result, setResult] = useState<string | null>(null);
@@ -64,10 +155,21 @@ export default function BuilderPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       platform: "sora",
+      inputs: {},
     },
   });
 
   const selectedPlatform = watch("platform");
+  const selectedTemplateId = watch("templateId");
+  const watchedInputs = watch("inputs") ?? {};
+  const selectedTemplate =
+    templates.find((template) => template.id === selectedTemplateId) ?? null;
+
+  useEffect(() => {
+    if (selectedTemplateId) {
+      setValue("inputs", {});
+    }
+  }, [selectedTemplateId, setValue]);
 
   useEffect(() => {
     let cancelled = false;
@@ -162,6 +264,7 @@ export default function BuilderPage() {
         if (!cancelled) {
           setTemplates(data.templates ?? []);
           setValue("templateId", "");
+          setValue("inputs", {});
         }
       } catch (error) {
         if (!cancelled) {
@@ -193,12 +296,8 @@ export default function BuilderPage() {
       body: JSON.stringify({
         template_id: values.templateId,
         input_json: {
-          scene: values.scene,
-          characters: values.characters ?? "",
-          action: values.action,
-          camera: values.camera ?? "",
-          constraints: values.constraints ?? "",
           platform: values.platform,
+          ...(values.inputs ?? {}),
         },
       }),
     });
@@ -294,6 +393,11 @@ export default function BuilderPage() {
               </option>
             ))}
           </select>
+          {selectedTemplate?.description && (
+            <p className="text-xs text-black/60">
+              {selectedTemplate.description}
+            </p>
+          )}
           {templatesError && (
             <p className="text-xs text-red-600">{templatesError}</p>
           )}
@@ -304,51 +408,39 @@ export default function BuilderPage() {
           )}
         </div>
 
-        <div className="grid gap-2">
-          <label className="text-sm font-medium">장면</label>
-          <textarea
-            className="min-h-[80px] rounded-md border border-black/10 px-3 py-2"
-            {...register("scene")}
-          />
-          {errors.scene && (
-            <p className="text-xs text-red-600">{errors.scene.message}</p>
-          )}
-        </div>
+        {selectedTemplate ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-3 rounded-xl border border-black/10 bg-white p-4 text-sm">
+              <p className="font-medium">입력 필드</p>
+              <p className="text-xs text-black/60">
+                템플릿에 포함된 키가 자동으로 표시됩니다.
+              </p>
+              {renderInputFields({
+                platform: selectedPlatform,
+                tokens: extractTokens(selectedTemplate.base_prompt),
+                register,
+              })}
+            </div>
 
-        <div className="grid gap-2">
-          <label className="text-sm font-medium">캐릭터</label>
-          <input
-            className="h-10 rounded-md border border-black/10 px-3"
-            {...register("characters")}
-          />
-        </div>
-
-        <div className="grid gap-2">
-          <label className="text-sm font-medium">액션</label>
-          <textarea
-            className="min-h-[80px] rounded-md border border-black/10 px-3 py-2"
-            {...register("action")}
-          />
-          {errors.action && (
-            <p className="text-xs text-red-600">{errors.action.message}</p>
-          )}
-        </div>
-
-        <div className="grid gap-2">
-          <label className="text-sm font-medium">카메라</label>
-          <input
-            className="h-10 rounded-md border border-black/10 px-3"
-            {...register("camera")}
-          />
-        </div>
-
-        <div className="grid gap-2">
-          <label className="text-sm font-medium">제약 조건</label>
-          <textarea
-            className="min-h-[60px] rounded-md border border-black/10 px-3 py-2"
-            {...register("constraints")}
-          />
-        </div>
+            <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
+              <p className="font-medium">실시간 미리보기</p>
+              <p className="mt-1 text-xs text-black/60">
+                입력값이 즉시 반영됩니다.
+              </p>
+              <pre className="mt-3 whitespace-pre-wrap text-black/70">
+                {buildPreview({
+                  platform: selectedPlatform,
+                  basePrompt: selectedTemplate.base_prompt,
+                  inputs: watchedInputs,
+                })}
+              </pre>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-black/60">
+            템플릿을 선택하면 입력 필드가 표시됩니다.
+          </p>
+        )}
 
         <Button type="submit" disabled={loading}>
           {loading ? "생성 중..." : "프롬프트 생성"}

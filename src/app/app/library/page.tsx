@@ -1,19 +1,10 @@
-import Link from "next/link";
-
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
+import { PromptList } from "@/app/app/library/prompt-list";
 import { fetchUserPrompts } from "@/lib/db";
 import { ensureArray } from "@/lib/db/repositories/guards";
 import { createServerSupabase } from "@/lib/supabase/server";
-
-function formatDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toLocaleDateString("ko-KR");
-}
 
 export default async function LibraryPage() {
   const supabase = await createServerSupabase();
@@ -36,31 +27,7 @@ export default async function LibraryPage() {
           body="잠시 후 다시 시도해주세요."
         />
       ) : hasPrompts ? (
-        <div className="grid gap-4">
-          {promptList.map((prompt) => (
-            <div
-              key={prompt.id}
-              className="rounded-xl border border-black/10 bg-white p-5 text-sm"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="font-medium">{prompt.title}</p>
-                  <p className="text-xs text-black/50">
-                    {prompt.platform_code.toUpperCase()} ·{" "}
-                    {formatDate(prompt.created_at)}
-                  </p>
-                </div>
-                <Link
-                  href={`/app/library/${prompt.id}`}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
-                  보기
-                </Link>
-              </div>
-              <p className="mt-3 text-black/70">{prompt.output_prompt}</p>
-            </div>
-          ))}
-        </div>
+        <PromptList prompts={promptList} />
       ) : (
         <EmptyState
           title="아직 저장된 프롬프트가 없습니다."

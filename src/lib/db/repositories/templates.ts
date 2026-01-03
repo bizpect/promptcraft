@@ -11,6 +11,7 @@ type ActiveTemplate = {
 type ActiveTemplateListItem = {
   id: string;
   platform_code: "sora" | "veo";
+  base_prompt: string;
   title: string;
   description: string | null;
 };

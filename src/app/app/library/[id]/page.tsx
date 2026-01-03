@@ -3,10 +3,10 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { PromptActions } from "@/components/library/prompt-actions";
 import { PromptMetaActions } from "@/components/library/prompt-meta-actions";
+import { RewriteHistory } from "@/components/library/rewrite-history";
 import { ErrorState } from "@/components/ui/error-state";
 import { fetchPromptDetailForUser, fetchRewritesForPrompt } from "@/lib/db";
 import { ensureArray } from "@/lib/db/repositories/guards";
-import { nonNullable } from "@/lib/db/repositories/types";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 function formatDate(value: string) {
@@ -80,28 +80,7 @@ export default async function LibraryDetailPage({
 
       <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
         <p className="font-medium">리라이팅 히스토리</p>
-        {rewriteList.length > 0 ? (
-          <div className="mt-3 space-y-3">
-            {rewriteList.filter(nonNullable).map((rewrite) => (
-              <div
-                key={rewrite.id}
-                className="rounded-lg border border-black/10 bg-black/5 p-3"
-              >
-                <p className="text-xs text-black/50">
-                  {rewrite.provider_code.toUpperCase()} ·{" "}
-                  {formatDate(rewrite.created_at)}
-                </p>
-                <p className="mt-2 whitespace-pre-wrap text-black/70">
-                  {rewrite.rewritten_prompt}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-2 text-black/60">
-            아직 리라이팅 히스토리가 없습니다.
-          </p>
-        )}
+        <RewriteHistory promptId={prompt.id} rewrites={rewriteList} />
       </div>
 
       <PromptActions

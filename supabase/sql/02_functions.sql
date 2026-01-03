@@ -53,10 +53,11 @@ create or replace function public.get_active_templates(platform_code_input text)
 returns table (
   id uuid,
   platform_code text,
+  base_prompt text,
   title text,
   description text
 ) language sql security invoker as $$
-  select t.id, t.platform_code, t.title, t.description
+  select t.id, t.platform_code, t.base_prompt, t.title, t.description
   from public.templates as t
   where t.platform_code = platform_code_input
     and t.is_active = true
@@ -152,6 +153,19 @@ returns table (
   where id = prompt_id
     and user_id = auth.uid()
   returning id, title;
+$$;
+
+create or replace function public.update_prompt_output(prompt_id uuid, output_prompt_input text)
+returns table (
+  id uuid,
+  output_prompt text
+) language sql security invoker as $$
+  update public.prompts
+  set output_prompt = output_prompt_input,
+      updated_at = now()
+  where id = prompt_id
+    and user_id = auth.uid()
+  returning id, output_prompt;
 $$;
 
 create or replace function public.duplicate_prompt(prompt_id uuid, title_input text)

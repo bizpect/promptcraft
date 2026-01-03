@@ -8,6 +8,7 @@ export {
   fetchUserPrompts,
   deletePromptForUser,
   updatePromptTitleForUser,
+  updatePromptOutputForUser,
   duplicatePromptForUser,
   insertPrompt,
 } from "@/lib/db/repositories/prompts";

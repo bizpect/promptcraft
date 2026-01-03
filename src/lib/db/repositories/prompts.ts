@@ -45,6 +45,11 @@ type PromptTitleResult = {
   title: string;
 };
 
+type PromptOutputResult = {
+  id: string;
+  output_prompt: string;
+};
+
 export async function fetchPromptOutputForUser(
   supabase: SupabaseClient,
   promptId: string
@@ -111,6 +116,20 @@ export async function updatePromptTitleForUser(
       title_input: title,
     })
     .returns<PromptTitleResult>()
+    .single();
+}
+
+export async function updatePromptOutputForUser(
+  supabase: SupabaseClient,
+  promptId: string,
+  outputPrompt: string
+): Promise<PostgrestSingleResponse<PromptOutputResult>> {
+  return supabase
+    .rpc("update_prompt_output", {
+      prompt_id: promptId,
+      output_prompt_input: outputPrompt,
+    })
+    .returns<PromptOutputResult>()
     .single();
 }
 
