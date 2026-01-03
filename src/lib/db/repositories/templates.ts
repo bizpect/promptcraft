@@ -22,7 +22,7 @@ export async function fetchActiveTemplateById(
     .rpc("get_active_template", {
       template_id: templateId,
     })
-    .returns<ActiveTemplate>()
+    .returns<ActiveTemplate[]>()
     .single();
 }
 
