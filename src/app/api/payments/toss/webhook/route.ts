@@ -47,42 +47,44 @@ export async function POST(request: Request) {
     "tosspayments-webhook-transmission-time"
   );
 
-  if (!webhookSecret) {
-    return errorResponse(
-      "webhook_secret_missing",
-      "웹훅 시크릿이 누락되었습니다.",
-      500
-    );
-  }
-
-  if (!signatureHeader || !transmissionTime) {
-    return errorResponse(
-      "missing_signature",
-      "서명 헤더가 필요합니다.",
-      401
-    );
-  }
-
-  const expected = createHmac("sha256", webhookSecret)
-    .update(`${rawBody}:${transmissionTime}`)
-    .digest();
-  const signatures = signatureHeader
-    .split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.startsWith("v1:"))
-    .map((value) => value.slice(3))
-    .filter(Boolean);
-  const matched = signatures.some((signature) => {
-    const decoded = Buffer.from(signature, "base64");
-    if (decoded.length !== expected.length) {
-      return false;
+  if (signatureHeader || transmissionTime) {
+    if (!webhookSecret) {
+      return errorResponse(
+        "webhook_secret_missing",
+        "웹훅 시크릿이 누락되었습니다.",
+        500
+      );
     }
 
-    return timingSafeEqual(decoded, expected);
-  });
+    if (!signatureHeader || !transmissionTime) {
+      return errorResponse(
+        "missing_signature",
+        "서명 헤더가 필요합니다.",
+        401
+      );
+    }
 
-  if (!matched) {
-    return errorResponse("invalid_signature", "서명 검증에 실패했습니다.", 401);
+    const expected = createHmac("sha256", webhookSecret)
+      .update(`${rawBody}:${transmissionTime}`)
+      .digest();
+    const signatures = signatureHeader
+      .split(",")
+      .map((value) => value.trim())
+      .filter((value) => value.startsWith("v1:"))
+      .map((value) => value.slice(3))
+      .filter(Boolean);
+    const matched = signatures.some((signature) => {
+      const decoded = Buffer.from(signature, "base64");
+      if (decoded.length !== expected.length) {
+        return false;
+      }
+
+      return timingSafeEqual(decoded, expected);
+    });
+
+    if (!matched) {
+      return errorResponse("invalid_signature", "서명 검증에 실패했습니다.", 401);
+    }
   }
 
   let payload: Record<string, unknown>;
