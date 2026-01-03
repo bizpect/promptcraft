@@ -62,6 +62,9 @@ supabase secrets set \
 - `/api/cron/billing-charge` 호출 시 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>` 필요
 - `vercel.json`에 Cron 헤더가 설정되어 있으니 `CRON_SECRET` 환경 변수를 추가하세요.
 
+5) Toss 웹훅 서명 검증
+- 헤더 `tosspayments-webhook-signature`, `tosspayments-webhook-transmission-time` 기준으로 HMAC SHA-256 검증
+
 ### Run
 
 ```bash

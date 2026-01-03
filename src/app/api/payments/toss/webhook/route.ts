@@ -40,11 +40,12 @@ function normalizeStatus(
 export async function POST(request: Request) {
   const rawBody = await request.text();
   const webhookSecret = process.env.TOSS_WEBHOOK_SECRET;
-  const signatureHeader =
-    request.headers.get("toss-signature") ??
-    request.headers.get("x-toss-signature") ??
-    request.headers.get("toss-webhook-signature") ??
-    request.headers.get("x-toss-webhook-signature");
+  const signatureHeader = request.headers.get(
+    "tosspayments-webhook-signature"
+  );
+  const transmissionTime = request.headers.get(
+    "tosspayments-webhook-transmission-time"
+  );
 
   if (!webhookSecret) {
     return errorResponse(
@@ -54,22 +55,30 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!signatureHeader) {
-    return errorResponse("missing_signature", "서명 헤더가 필요합니다.", 401);
+  if (!signatureHeader || !transmissionTime) {
+    return errorResponse(
+      "missing_signature",
+      "서명 헤더가 필요합니다.",
+      401
+    );
   }
 
-  const hmac = createHmac("sha256", webhookSecret)
-    .update(rawBody)
+  const expected = createHmac("sha256", webhookSecret)
+    .update(`${rawBody}:${transmissionTime}`)
     .digest();
-  const expectedHex = hmac.toString("hex");
-  const expectedBase64 = hmac.toString("base64");
-  const signature = signatureHeader.trim();
-  const matched = [expectedHex, expectedBase64].some((expected) => {
-    if (signature.length !== expected.length) {
+  const signatures = signatureHeader
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.startsWith("v1:"))
+    .map((value) => value.slice(3))
+    .filter(Boolean);
+  const matched = signatures.some((signature) => {
+    const decoded = Buffer.from(signature, "base64");
+    if (decoded.length !== expected.length) {
       return false;
     }
 
-    return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+    return timingSafeEqual(decoded, expected);
   });
 
   if (!matched) {
