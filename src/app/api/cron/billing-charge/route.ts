@@ -8,12 +8,16 @@ export async function GET(request: Request) {
   const headerSecret = request.headers.get("x-cron-secret");
   const providedSecret =
     (bearer && bearer.length > 0 ? bearer : null) ?? headerSecret ?? null;
+  const userAgent = request.headers.get("user-agent") ?? "";
+  const isVercelCron = userAgent.toLowerCase().includes("vercel-cron");
 
-  if (!cronSecret || !providedSecret || cronSecret !== providedSecret) {
-    return NextResponse.json(
-      { ok: false, error: "Unauthorized" },
-      { status: 401 }
-    );
+  if (!isVercelCron) {
+    if (!cronSecret || !providedSecret || cronSecret !== providedSecret) {
+      return NextResponse.json(
+        { ok: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
   }
 
   const projectRef = process.env.NEXT_PUBLIC_SB_URL?.match(

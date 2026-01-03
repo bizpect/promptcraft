@@ -2,13 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/billing-charge",
-      "schedule": "0 0 * * *",
-      "headers": [
-        {
-          "key": "x-cron-secret",
-          "value": "${CRON_SECRET}"
-        }
-      ]
+      "schedule": "0 0 * * *"
     }
   ]
 }
