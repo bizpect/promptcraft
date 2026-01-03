@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
-import { formatForPlatform, renderBasePrompt } from "@/lib/templates/render";
 
 const formSchema = z.object({
   templateId: z.string().min(1, "템플릿을 선택하세요."),
@@ -47,6 +46,7 @@ const LABEL_MAP: Record<string, string> = {
   location: "장소",
   lighting: "조명",
   mood: "분위기",
+  tone: "영상 분위기",
   camera: "카메라",
   action: "액션",
   characters: "캐릭터",
@@ -77,15 +77,6 @@ function extractTokens(basePrompt: string) {
   }
 
   return Array.from(tokens);
-}
-
-function buildPreview(input: {
-  platform: "sora" | "veo";
-  basePrompt: string;
-  inputs: Record<string, string>;
-}) {
-  const rendered = renderBasePrompt(input.basePrompt, input.inputs);
-  return formatForPlatform(input.platform, rendered, input.inputs);
 }
 
 function renderInputFields(input: {
@@ -162,7 +153,6 @@ export default function BuilderPage() {
 
   const selectedPlatform = watch("platform");
   const selectedTemplateId = watch("templateId");
-  const watchedInputs = watch("inputs") ?? {};
   const selectedTemplate =
     templates.find((template) => template.id === selectedTemplateId) ?? null;
 
@@ -408,11 +398,6 @@ export default function BuilderPage() {
               <LoadingSpinner size={16} />
             </div>
           )}
-          {selectedTemplate?.description && (
-            <p className="text-xs text-white/60">
-              {selectedTemplate.description}
-            </p>
-          )}
           {templatesError && (
             <p className="text-xs text-red-300">{templatesError}</p>
           )}
@@ -424,32 +409,16 @@ export default function BuilderPage() {
         </div>
 
         {selectedTemplate ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
-              <p className="font-medium text-white">입력 필드</p>
-              <p className="text-xs text-white/60">
-                템플릿에 포함된 키가 자동으로 표시됩니다.
-              </p>
-              {renderInputFields({
-                platform: selectedPlatform,
-                tokens: extractTokens(selectedTemplate.base_prompt),
-                register,
-              })}
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
-              <p className="font-medium text-white">실시간 미리보기</p>
-              <p className="mt-1 text-xs text-white/60">
-                입력값이 즉시 반영됩니다.
-              </p>
-              <pre className="mt-3 whitespace-pre-wrap text-white/70">
-                {buildPreview({
-                  platform: selectedPlatform,
-                  basePrompt: selectedTemplate.base_prompt,
-                  inputs: watchedInputs,
-                })}
-              </pre>
-            </div>
+          <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+            <p className="font-medium text-white">입력 필드</p>
+            <p className="text-xs text-white/60">
+              템플릿에 포함된 키가 자동으로 표시됩니다.
+            </p>
+            {renderInputFields({
+              platform: selectedPlatform,
+              tokens: extractTokens(selectedTemplate.base_prompt),
+              register,
+            })}
           </div>
         ) : (
           <p className="text-xs text-white/60">

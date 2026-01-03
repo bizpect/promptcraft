@@ -64,13 +64,6 @@ export default async function LibraryDetailPage({
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
-        <p className="font-medium text-white">입력 값</p>
-        <pre className="mt-3 whitespace-pre-wrap text-white/70">
-          {JSON.stringify(prompt.input_json, null, 2)}
-        </pre>
-      </div>
-
       <PromptMetaActions promptId={prompt.id} initialTitle={prompt.title} />
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
