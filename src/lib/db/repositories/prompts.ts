@@ -1,4 +1,8 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type {
+  PostgrestResponse,
+  PostgrestSingleResponse,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 
 type InsertPromptInput = {
   templateId: string;
@@ -43,7 +47,7 @@ type PromptTitleResult = {
 export async function fetchPromptOutputForUser(
   supabase: SupabaseClient,
   promptId: string
-) {
+): Promise<PostgrestSingleResponse<PromptOutput>> {
   return supabase
     .rpc("get_prompt_output", {
       prompt_id: promptId,
@@ -55,7 +59,7 @@ export async function fetchPromptOutputForUser(
 export async function insertPrompt(
   supabase: SupabaseClient,
   input: InsertPromptInput
-) {
+): Promise<PostgrestSingleResponse<PromptInsertResult>> {
   return supabase
     .rpc("create_prompt", {
       template_id: input.templateId,
@@ -68,14 +72,16 @@ export async function insertPrompt(
     .single();
 }
 
-export async function fetchUserPrompts(supabase: SupabaseClient) {
+export async function fetchUserPrompts(
+  supabase: SupabaseClient
+): Promise<PostgrestResponse<PromptListItem>> {
   return supabase.rpc("get_user_prompts").returns<PromptListItem[]>();
 }
 
 export async function fetchPromptDetailForUser(
   supabase: SupabaseClient,
   promptId: string
-) {
+): Promise<PostgrestSingleResponse<PromptDetail>> {
   return supabase
     .rpc("get_prompt_detail", {
       prompt_id: promptId,
@@ -87,7 +93,7 @@ export async function fetchPromptDetailForUser(
 export async function deletePromptForUser(
   supabase: SupabaseClient,
   promptId: string
-) {
+): Promise<PostgrestResponse<null>> {
   return supabase.rpc("delete_prompt", {
     prompt_id: promptId,
   });
@@ -97,7 +103,7 @@ export async function updatePromptTitleForUser(
   supabase: SupabaseClient,
   promptId: string,
   title: string
-) {
+): Promise<PostgrestSingleResponse<PromptTitleResult>> {
   return supabase
     .rpc("update_prompt_title", {
       prompt_id: promptId,
@@ -111,7 +117,7 @@ export async function duplicatePromptForUser(
   supabase: SupabaseClient,
   promptId: string,
   title: string | null
-) {
+): Promise<PostgrestSingleResponse<PromptTitleResult>> {
   return supabase
     .rpc("duplicate_prompt", {
       prompt_id: promptId,
