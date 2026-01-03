@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { recordPaymentAttempt } from "@/lib/db";
 import { createBrowserSupabase } from "@/lib/supabase/client";
+import { LoadingOverlay } from "@/components/ui/loading";
 
 type BillingCallbackProps = {
   authKey?: string;
@@ -192,10 +193,37 @@ export function BillingCallback({
     bannerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [status]);
 
+  useEffect(() => {
+    if (!status || status.tone === "info") {
+      return;
+    }
+
+    const hasQuery =
+      resolvedAuthKey ||
+      resolvedCustomerKey ||
+      resolvedResult ||
+      resolvedPlanCode ||
+      resolvedOrderId ||
+      resolvedMode;
+
+    if (hasQuery) {
+      window.history.replaceState(null, "", "/app/billing");
+    }
+  }, [
+    status,
+    resolvedAuthKey,
+    resolvedCustomerKey,
+    resolvedResult,
+    resolvedPlanCode,
+    resolvedOrderId,
+    resolvedMode,
+  ]);
+
   if (!status) {
     return null;
   }
 
+  const isLoading = status.tone === "info";
   const toneStyles =
     status.tone === "success"
       ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
@@ -204,12 +232,17 @@ export function BillingCallback({
         : "border-amber-400/30 bg-amber-500/10 text-amber-100";
 
   return (
-    <div
-      ref={bannerRef}
-      role="alert"
-      className={`rounded-2xl border p-4 text-sm font-medium ${toneStyles}`}
-    >
-      {status.message}
-    </div>
+    <>
+      {!isLoading && (
+        <div
+          ref={bannerRef}
+          role="alert"
+          className={`rounded-2xl border p-4 text-sm font-medium ${toneStyles}`}
+        >
+          {status.message}
+        </div>
+      )}
+      <LoadingOverlay show={isLoading} />
+    </>
   );
 }
