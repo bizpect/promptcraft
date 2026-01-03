@@ -282,6 +282,24 @@ begin
 end;
 $$;
 
+create or replace function public.finalize_subscription_cancellations()
+returns integer language plpgsql security invoker as $$
+declare
+  affected_count integer := 0;
+begin
+  update public.subscriptions
+  set
+    status_code = 'canceled',
+    updated_at = now()
+  where status_code = 'active'
+    and cancel_at is not null
+    and cancel_at <= now();
+
+  get diagnostics affected_count = row_count;
+  return affected_count;
+end;
+$$;
+
 create or replace function public.get_user_payments()
 returns table (
   id uuid,

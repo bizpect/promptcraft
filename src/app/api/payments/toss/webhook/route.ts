@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createHmac, timingSafeEqual } from "crypto";
 
 import { errorResponse } from "@/lib/api/response";
 import { applyBillingKeyRevoked, applyPaymentWebhook } from "@/lib/db";
@@ -38,7 +39,41 @@ function normalizeStatus(
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
-  console.warn("[payments] webhook signature not supported; verifying by API");
+  const webhookSecret = process.env.TOSS_WEBHOOK_SECRET;
+  const signatureHeader =
+    request.headers.get("toss-signature") ??
+    request.headers.get("x-toss-signature") ??
+    request.headers.get("toss-webhook-signature");
+
+  if (!webhookSecret) {
+    return errorResponse(
+      "webhook_secret_missing",
+      "웹훅 시크릿이 누락되었습니다.",
+      500
+    );
+  }
+
+  if (!signatureHeader) {
+    return errorResponse("missing_signature", "서명 헤더가 필요합니다.", 401);
+  }
+
+  const hmac = createHmac("sha256", webhookSecret)
+    .update(rawBody)
+    .digest();
+  const expectedHex = hmac.toString("hex");
+  const expectedBase64 = hmac.toString("base64");
+  const signature = signatureHeader.trim();
+  const matched = [expectedHex, expectedBase64].some((expected) => {
+    if (signature.length !== expected.length) {
+      return false;
+    }
+
+    return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  });
+
+  if (!matched) {
+    return errorResponse("invalid_signature", "서명 검증에 실패했습니다.", 401);
+  }
 
   let payload: Record<string, unknown>;
 

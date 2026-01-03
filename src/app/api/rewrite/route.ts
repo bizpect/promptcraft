@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/api/response";
 import {
   fetchPromptOutputForUser,
-  fetchSubscriptionForUser,
+  fetchSubscriptionWithLabels,
   insertRewrite,
   updateSubscriptionRewriteUsed,
 } from "@/lib/db";
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   }
 
   const { data: subscription, error: subError } =
-    await fetchSubscriptionForUser(supabase);
+    await fetchSubscriptionWithLabels(supabase);
 
   if (subError || !subscription) {
     logSupabaseError("subscriptions.select", subError);
@@ -56,6 +56,13 @@ export async function POST(request: Request) {
 
   if (subscription.status_code !== "active") {
     return errorResponse("inactive_plan", "활성 플랜이 아닙니다.", 403);
+  }
+
+  if (subscription.cancel_at) {
+    const cancelAt = new Date(subscription.cancel_at).getTime();
+    if (!Number.isNaN(cancelAt) && cancelAt <= Date.now()) {
+      return errorResponse("inactive_plan", "구독이 만료되었습니다.", 403);
+    }
   }
 
   if (subscription.rewrite_used >= subscription.rewrite_limit) {

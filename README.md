@@ -31,7 +31,9 @@ cp .env.example .env.local
 - `SB_SERVICE_ROLE_KEY`: Supabase service role key
 - `TOSS_CLIENT_KEY`: 토스 결제 클라이언트 키
 - `TOSS_SECRET_KEY`: 토스 결제 시크릿 키
+- `TOSS_WEBHOOK_SECRET`: 토스 웹훅 서명 시크릿
 - `TOSS_API_BASE_URL`: 기본 `https://api.tosspayments.com/v1` (선택)
+- `CRON_SECRET`: `/api/cron/billing-charge` 보호용 시크릿
 
 ## Supabase Billing Cron
 
@@ -55,6 +57,9 @@ supabase secrets set \
 - Project → Edge Functions → Schedules
 - Function: `billing-charge`
 - Schedule: `0 0 * * *` (매일 00:00 UTC, 필요 시 변경)
+
+4) Vercel Cron/외부 호출 보호
+- `/api/cron/billing-charge` 호출 시 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>` 필요
 
 ### Run
 

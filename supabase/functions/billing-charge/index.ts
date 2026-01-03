@@ -75,6 +75,8 @@ Deno.serve(async () => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
+  await supabase.rpc("finalize_subscription_cancellations");
+
   const cutoff = new Date().toISOString();
   const { data: dueSubscriptions, error } = await supabase
     .rpc("get_due_subscriptions_for_billing", {

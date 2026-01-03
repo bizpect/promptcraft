@@ -1,6 +1,21 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader = request.headers.get("authorization") ?? "";
+  const bearer =
+    authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const headerSecret = request.headers.get("x-cron-secret");
+  const providedSecret =
+    (bearer && bearer.length > 0 ? bearer : null) ?? headerSecret ?? null;
+
+  if (!cronSecret || !providedSecret || cronSecret !== providedSecret) {
+    return NextResponse.json(
+      { ok: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   const projectRef = process.env.NEXT_PUBLIC_SB_URL?.match(
     /https:\/\/([^.]+)\.supabase\.co/
   )?.[1];
