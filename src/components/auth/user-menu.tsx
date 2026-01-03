@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { buttonVariants } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,8 @@ export function UserMenu({ email }: UserMenuProps) {
         className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
         disabled={loading}
       >
-        {loading ? "로그아웃 중..." : "로그아웃"}
+        {loading && <LoadingSpinner size={14} />}
+        로그아웃
       </button>
     </div>
   );

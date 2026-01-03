@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 
 type PromptActionsProps = {
   promptId: string;
@@ -75,14 +76,16 @@ export function PromptActions({ promptId, platformCode }: PromptActionsProps) {
     <div className="space-y-4 rounded-xl border border-black/10 bg-white p-5 text-sm">
       <div className="flex flex-wrap gap-2">
         <Button onClick={handleRewrite} disabled={rewriteLoading}>
-          {rewriteLoading ? "리라이팅 중..." : "리라이팅 실행"}
+          {rewriteLoading && <LoadingSpinner size={16} />}
+          리라이팅 실행
         </Button>
         <Button
           variant="outline"
           onClick={handleDelete}
           disabled={deleteLoading}
         >
-          {deleteLoading ? "삭제 중..." : "삭제"}
+          {deleteLoading && <LoadingSpinner size={16} />}
+          삭제
         </Button>
       </div>
 
@@ -94,6 +97,7 @@ export function PromptActions({ promptId, platformCode }: PromptActionsProps) {
 
       {rewriteError && <p className="text-red-600">{rewriteError}</p>}
       {deleteError && <p className="text-red-600">{deleteError}</p>}
+      <LoadingOverlay show={rewriteLoading || deleteLoading} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 
 type RewriteItem = {
   id: string;
@@ -140,7 +141,8 @@ export function RewriteHistory({ promptId, rewrites }: RewriteHistoryProps) {
                   onClick={() => handleApply(rewrite)}
                   disabled={applyLoading === rewrite.id}
                 >
-                  {applyLoading === rewrite.id ? "적용 중..." : "현재 프롬프트로 적용"}
+                  {applyLoading === rewrite.id && <LoadingSpinner size={14} />}
+                  현재 프롬프트로 적용
                 </Button>
               </div>
             </div>
@@ -152,6 +154,7 @@ export function RewriteHistory({ promptId, rewrites }: RewriteHistoryProps) {
       </div>
 
       {message && <p className="text-xs text-black/60">{message}</p>}
+      <LoadingOverlay show={applyLoading !== null} />
     </div>
   );
 }

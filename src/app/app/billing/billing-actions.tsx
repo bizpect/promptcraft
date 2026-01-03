@@ -4,6 +4,7 @@ import { useState } from "react";
 import Script from "next/script";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 import { recordPaymentAttempt } from "@/lib/db";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
@@ -183,11 +184,8 @@ export function BillingActions({
               onClick={() => startBilling("pro")}
               disabled={loadingPlan !== null || isProActive}
             >
-              {isProActive
-                ? "이용 중"
-                : loadingPlan === "pro"
-                  ? "결제 진행 중..."
-                  : `${billingLabel}로 Pro 시작`}
+              {loadingPlan === "pro" && <LoadingSpinner size={16} />}
+              {isProActive ? "이용 중" : `${billingLabel}로 Pro 시작`}
             </Button>
           </div>
 
@@ -209,17 +207,17 @@ export function BillingActions({
               onClick={() => startBilling("max")}
               disabled={loadingPlan !== null}
             >
-              {loadingPlan === "max"
-                ? "결제 진행 중..."
-                : isProActive
-                  ? `${billingLabel}로 Max 업그레이드`
-                  : `${billingLabel}로 Max 시작`}
+              {loadingPlan === "max" && <LoadingSpinner size={16} />}
+              {isProActive
+                ? `${billingLabel}로 Max 업그레이드`
+                : `${billingLabel}로 Max 시작`}
             </Button>
           </div>
         </div>
       )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
+      <LoadingOverlay show={loadingPlan !== null} />
     </div>
   );
 }

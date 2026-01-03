@@ -5,6 +5,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { buttonVariants } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
 function LoginContent() {
@@ -51,8 +52,10 @@ function LoginContent() {
         className={buttonVariants({ variant: "default" })}
         disabled={loading}
       >
-        {loading ? "연결 중..." : "Google로 계속하기"}
+        {loading && <LoadingSpinner size={16} />}
+        Google로 계속하기
       </button>
+      <LoadingOverlay show={loading} />
     </div>
   );
 }
@@ -61,8 +64,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto flex min-h-screen w-full max-w-xl items-center px-6 py-16 text-sm text-black/70">
-          로그인 화면 불러오는 중...
+        <div className="mx-auto flex min-h-screen w-full max-w-xl items-center justify-center px-6 py-16">
+          <LoadingSpinner size={36} />
         </div>
       }
     >

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 type PromptMetaActionsProps = {
   promptId: string;
@@ -86,14 +87,16 @@ export function PromptMetaActions({
           placeholder="제목을 입력하세요"
         />
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? "저장 중..." : "저장"}
+          {saving && <LoadingSpinner size={14} />}
+          저장
         </Button>
         <Button
           variant="outline"
           onClick={handleDuplicate}
           disabled={duplicating}
         >
-          {duplicating ? "복제 중..." : "복제"}
+          {duplicating && <LoadingSpinner size={14} />}
+          복제
         </Button>
       </div>
       {success && <p className="mt-2 text-green-600">{success}</p>}

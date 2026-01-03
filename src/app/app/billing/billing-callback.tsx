@@ -111,7 +111,7 @@ export function BillingCallback({
 
     const sendUpdate = async () => {
       setStatus({
-        message: "새 결제수단을 등록하는 중...",
+        message: "새 결제수단을 등록합니다.",
         tone: "info",
       });
 
@@ -142,7 +142,7 @@ export function BillingCallback({
 
     const sendIssue = async () => {
       setStatus({
-        message: "빌링키를 발급하고 결제를 확인하는 중...",
+        message: "빌링키를 발급하고 결제를 확인합니다.",
         tone: "info",
       });
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Script from "next/script";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 import { recordPaymentAttempt } from "@/lib/db";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
@@ -148,9 +149,11 @@ export function PaymentMethodActions({
         다음 결제부터 새 카드로 결제됩니다.
       </p>
       <Button className="mt-3" onClick={startUpdate} disabled={loading}>
-        {loading ? "변경 진행 중..." : "결제수단 변경"}
+        {loading && <LoadingSpinner size={16} />}
+        결제수단 변경
       </Button>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      <LoadingOverlay show={loading} />
     </div>
   );
 }

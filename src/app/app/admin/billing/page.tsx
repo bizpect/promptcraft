@@ -60,7 +60,7 @@ export default async function AdminBillingPage() {
 
       {(subscriptionError || planError || paymentError) && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          데이터를 불러오는 중 오류가 발생했습니다.
+          데이터를 가져오지 못했습니다.
         </div>
       )}
 

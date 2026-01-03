@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 import { ErrorState } from "@/components/ui/error-state";
 import {
   AVATAR_ALLOWED_TYPES,
@@ -121,7 +122,11 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <p className="text-sm text-black/60">불러오는 중...</p>;
+    return (
+      <div className="flex min-h-[240px] items-center justify-center">
+        <LoadingSpinner size={32} />
+      </div>
+    );
   }
 
   if (error && !profile) {
@@ -263,13 +268,14 @@ export default function ProfilePage() {
               onClick={handleAvatarRemove}
               disabled={!avatarUrl || uploading || removing}
             >
-              {removing ? "삭제 중..." : "이미지 삭제"}
+              {removing && <LoadingSpinner size={14} />}
+              이미지 삭제
             </Button>
           </div>
           <p className="text-xs text-black/50">
             JPG/PNG/WEBP, {maxUploadMb}MB 이하. 업로드 시 자동 리사이즈됩니다.
           </p>
-          {uploading && <p className="text-black/60">업로드 중...</p>}
+          {uploading && <LoadingSpinner size={16} />}
         </div>
 
         <div className="space-y-2">
@@ -299,12 +305,14 @@ export default function ProfilePage() {
         </div>
 
         <Button type="submit" disabled={saving}>
-          {saving ? "저장 중..." : "저장"}
+          {saving && <LoadingSpinner size={16} />}
+          저장
         </Button>
 
         {success && <p className="text-green-600">{success}</p>}
         {error && <p className="text-red-600">{error}</p>}
       </form>
+      <LoadingOverlay show={saving || uploading || removing} />
     </div>
   );
 }

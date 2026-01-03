@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 
 type SubscriptionActionsProps = {
   currentStatusCode: string | null;
@@ -112,7 +113,8 @@ export function SubscriptionActions({
             onClick={handleUndoCancel}
             disabled={loading}
           >
-            {loading ? "처리 중..." : "해지 예약 취소"}
+            {loading && <LoadingSpinner size={14} />}
+            해지 예약 취소
           </Button>
         </>
       ) : (
@@ -121,7 +123,8 @@ export function SubscriptionActions({
           onClick={() => setConfirmOpen(true)}
           disabled={loading}
         >
-          {loading ? "해지 예약 중..." : "구독 해지 예약"}
+          {loading && <LoadingSpinner size={14} />}
+          구독 해지 예약
         </Button>
       )}
       {message && <p className="text-xs text-black/50">{message}</p>}
@@ -170,12 +173,14 @@ export function SubscriptionActions({
                 닫기
               </Button>
               <Button size="sm" onClick={handleCancel} disabled={loading}>
-                {loading ? "처리 중..." : "해지 예약"}
+                {loading && <LoadingSpinner size={14} />}
+                해지 예약
               </Button>
             </div>
           </div>
         </div>
       )}
+      <LoadingOverlay show={loading} />
     </div>
   );
 }

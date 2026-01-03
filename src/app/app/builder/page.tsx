@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay, LoadingSpinner } from "@/components/ui/loading";
 import { formatForPlatform, renderBasePrompt } from "@/lib/templates/render";
 
 const formSchema = z.object({
@@ -326,7 +327,9 @@ export default function BuilderPage() {
         <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
           <p className="font-medium">내 프로필</p>
           {profileLoading ? (
-            <p className="mt-1 text-black/60">불러오는 중...</p>
+            <div className="mt-2">
+              <LoadingSpinner size={18} />
+            </div>
           ) : profile ? (
             <div className="mt-2 space-y-1 text-black/70">
               <p>이름: {profile.display_name ?? "미설정"}</p>
@@ -340,7 +343,9 @@ export default function BuilderPage() {
         <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
           <p className="font-medium">리라이팅 한도</p>
           {subscriptionLoading ? (
-            <p className="mt-1 text-black/60">불러오는 중...</p>
+            <div className="mt-2">
+              <LoadingSpinner size={18} />
+            </div>
           ) : subscription ? (
             <div className="mt-2 space-y-1 text-black/70">
               <p>
@@ -385,7 +390,7 @@ export default function BuilderPage() {
             {...register("templateId")}
           >
             <option value="">
-              {templatesLoading ? "불러오는 중..." : "선택하세요"}
+              선택하세요
             </option>
             {templates.map((item) => (
               <option key={item.id} value={item.id}>
@@ -393,6 +398,11 @@ export default function BuilderPage() {
               </option>
             ))}
           </select>
+          {templatesLoading && (
+            <div className="mt-2">
+              <LoadingSpinner size={16} />
+            </div>
+          )}
           {selectedTemplate?.description && (
             <p className="text-xs text-black/60">
               {selectedTemplate.description}
@@ -443,7 +453,8 @@ export default function BuilderPage() {
         )}
 
         <Button type="submit" disabled={loading}>
-          {loading ? "생성 중..." : "프롬프트 생성"}
+          {loading && <LoadingSpinner size={16} />}
+          프롬프트 생성
         </Button>
       </form>
 
@@ -452,6 +463,9 @@ export default function BuilderPage() {
           {result}
         </div>
       )}
+      <LoadingOverlay
+        show={loading || profileLoading || subscriptionLoading || templatesLoading}
+      />
     </div>
   );
 }
