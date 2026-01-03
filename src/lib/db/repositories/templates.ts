@@ -1,4 +1,8 @@
-import type { PostgrestResponse, SupabaseClient } from "@supabase/supabase-js";
+import type {
+  PostgrestResponse,
+  PostgrestSingleResponse,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 
 import type { RpcArrayResult } from "@/lib/db/repositories/types";
 
@@ -19,7 +23,7 @@ type ActiveTemplateListItem = {
 export async function fetchActiveTemplateById(
   supabase: SupabaseClient,
   templateId: string
-) {
+): Promise<PostgrestSingleResponse<ActiveTemplate>> {
   return supabase
     .rpc("get_active_template", {
       template_id: templateId,
