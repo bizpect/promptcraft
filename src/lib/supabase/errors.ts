@@ -7,16 +7,24 @@ type SupabaseErrorLike = {
 
 export function logSupabaseError(
   context: string,
-  error: SupabaseErrorLike | null | undefined
+  error: unknown
 ) {
   if (!error) {
     return;
   }
 
+  if (typeof error !== "object") {
+    console.error(`[supabase] ${context}`, { message: String(error) });
+    return;
+  }
+
+  const supabaseError = error as SupabaseErrorLike;
+  const fallbackMessage = error instanceof Error ? error.message : undefined;
+
   console.error(`[supabase] ${context}`, {
-    message: error.message,
-    code: error.code,
-    details: error.details,
-    hint: error.hint,
+    message: supabaseError.message ?? fallbackMessage,
+    code: supabaseError.code,
+    details: supabaseError.details,
+    hint: supabaseError.hint,
   });
 }
