@@ -44,4 +44,3 @@
   - `supabase/sql/04_rls.sql`
   - `supabase/sql/05_indexes.sql`
   - `supabase/sql/06_codes.sql`
-  - `supabase/sql/07_rpc.sql`

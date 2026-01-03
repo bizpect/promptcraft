@@ -4,8 +4,8 @@ type SupabaseConfig = {
 };
 
 export function getSupabaseConfig(): SupabaseConfig {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = process.env.NEXT_PUBLIC_SB_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SB_ANON_KEY;
 
   if (!url || !anonKey) {
     throw new Error("Missing Supabase environment variables");
@@ -15,7 +15,7 @@ export function getSupabaseConfig(): SupabaseConfig {
 }
 
 export function getServiceRoleKey() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SB_SERVICE_ROLE_KEY;
 
   if (!serviceKey) {
     throw new Error("Missing Supabase service role environment variables");

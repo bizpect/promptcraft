@@ -23,6 +23,39 @@ npm install
 cp .env.example .env.local
 ```
 
+추가로 아래 환경 변수가 필요합니다.
+
+- `NEXT_PUBLIC_APP_URL`: 앱 베이스 URL (예: `https://promptcraft...vercel.app`)
+- `NEXT_PUBLIC_SB_URL`: Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SB_ANON_KEY`: Supabase anon key
+- `SB_SERVICE_ROLE_KEY`: Supabase service role key
+- `TOSS_CLIENT_KEY`: 토스 결제 클라이언트 키
+- `TOSS_SECRET_KEY`: 토스 결제 시크릿 키
+- `TOSS_API_BASE_URL`: 기본 `https://api.tosspayments.com/v1` (선택)
+
+## Supabase Billing Cron
+
+정기 결제는 Supabase Edge Function + Cron을 사용합니다.
+
+1) Edge Function 배포
+```bash
+supabase functions deploy billing-charge --no-verify-jwt
+```
+
+2) 함수용 환경 변수 설정
+```bash
+supabase secrets set \
+  SB_URL=your_project_url \
+  SB_SERVICE_ROLE_KEY=your_service_role_key \
+  TOSS_SECRET_KEY=your_toss_secret_key \
+  TOSS_API_BASE_URL=https://api.tosspayments.com/v1
+```
+
+3) Supabase Dashboard에서 Cron 등록
+- Project → Edge Functions → Schedules
+- Function: `billing-charge`
+- Schedule: `0 0 * * *` (매일 00:00 UTC, 필요 시 변경)
+
 ### Run
 
 ```bash

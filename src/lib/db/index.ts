@@ -16,6 +16,20 @@ export {
   fetchSubscriptionWithLabels,
   updateSubscriptionRewriteUsed,
 } from "@/lib/db/repositories/subscriptions";
+export {
+  applyPaymentConfirmation,
+  applyPaymentWebhook,
+  createPaymentEvent,
+} from "@/lib/db/repositories/payments";
+export {
+  fetchBillingProfile,
+  upsertBillingProfile,
+  fetchSubscriptionPlanDetail,
+  fetchDueSubscriptionsForBilling,
+  applyBillingChargeSuccess,
+  applyBillingChargeFailure,
+  applyBillingKeyRevoked,
+} from "@/lib/db/repositories/billing";
 export { insertRewrite } from "@/lib/db/repositories/rewrites";
 export { fetchRewritesForPrompt } from "@/lib/db/repositories/rewrites";
 export {

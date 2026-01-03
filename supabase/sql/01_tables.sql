@@ -42,6 +42,71 @@ create table if not exists public.subscriptions (
     references public.common_codes (code_group, code)
 );
 
+create table if not exists public.billing_profiles (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  provider_group text not null default 'payment_provider'
+    check (provider_group = 'payment_provider'),
+  provider_code text not null,
+  status_group text not null default 'billing_status'
+    check (status_group = 'billing_status'),
+  status_code text not null,
+  customer_key text not null,
+  billing_key text not null,
+  card_summary text,
+  raw_response jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint billing_profiles_provider_fk
+    foreign key (provider_group, provider_code)
+    references public.common_codes (code_group, code),
+  constraint billing_profiles_status_fk
+    foreign key (status_group, status_code)
+    references public.common_codes (code_group, code),
+  unique (provider_group, provider_code, billing_key)
+);
+
+create table if not exists public.payments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  provider_group text not null default 'payment_provider'
+    check (provider_group = 'payment_provider'),
+  provider_code text not null,
+  status_group text not null default 'payment_status'
+    check (status_group = 'payment_status'),
+  status_code text not null,
+  order_id text not null,
+  payment_key text,
+  amount integer not null,
+  currency text not null default 'KRW',
+  method text,
+  requested_at timestamptz,
+  approved_at timestamptz,
+  raw_response jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint payments_provider_fk
+    foreign key (provider_group, provider_code)
+    references public.common_codes (code_group, code),
+  constraint payments_status_fk
+    foreign key (status_group, status_code)
+    references public.common_codes (code_group, code),
+  unique (provider_group, provider_code, order_id)
+);
+
+create table if not exists public.payment_events (
+  id uuid primary key default gen_random_uuid(),
+  payment_id uuid references public.payments (id) on delete cascade,
+  provider_group text not null default 'payment_provider'
+    check (provider_group = 'payment_provider'),
+  provider_code text not null,
+  event_type text not null,
+  event_payload jsonb not null default '{}'::jsonb,
+  received_at timestamptz not null default now(),
+  constraint payment_events_provider_fk
+    foreign key (provider_group, provider_code)
+    references public.common_codes (code_group, code)
+);
+
 create table if not exists public.templates (
   id uuid primary key default gen_random_uuid(),
   title text not null,
