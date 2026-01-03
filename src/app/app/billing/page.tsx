@@ -111,17 +111,19 @@ export default async function BillingPage({
         <p className="mt-3 text-xs text-black/50">
           토스페이먼츠 정기결제는 테스트 키로 먼저 검증할 수 있습니다.
         </p>
-        <div className="mt-4 rounded-lg border border-black/5 bg-black/5 p-3 text-xs text-black/60">
-          <p className="font-medium text-black/80">해지 안내</p>
-          <p className="mt-1">
-            해지는 다음 결제일부터 반영되며, 만료일까지 모든 기능을 그대로
-            이용할 수 있습니다.
-          </p>
-          <p className="mt-1">
-            해지 후에는 자동결제가 중단되며, 필요 시 언제든 다시 구독할 수
-            있습니다.
-          </p>
-        </div>
+        {subscription?.plan_code && subscription.plan_code !== "free" && (
+          <div className="mt-4 rounded-lg border border-black/5 bg-black/5 p-3 text-xs text-black/60">
+            <p className="font-medium text-black/80">해지 안내</p>
+            <p className="mt-1">
+              해지는 다음 결제일부터 반영되며, 만료일까지 모든 기능을 그대로
+              이용할 수 있습니다.
+            </p>
+            <p className="mt-1">
+              해지 후에는 자동결제가 중단되며, 필요 시 언제든 다시 구독할 수
+              있습니다.
+            </p>
+          </div>
+        )}
       </div>
 
       <BillingCallback
