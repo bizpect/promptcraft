@@ -34,6 +34,7 @@ export default async function BillingPage({
   const rewriteUsed = subscription?.rewrite_used ?? 0;
   const rewriteLimit = subscription?.rewrite_limit ?? 0;
   const currentPeriodEnd = subscription?.current_period_end ?? null;
+  const cancelAt = subscription?.cancel_at ?? null;
   const authKey = searchParams?.authKey ?? searchParams?.auth_key;
   const customerKey = searchParams?.customerKey ?? searchParams?.customer_key;
   const planCode = searchParams?.plan;
@@ -85,7 +86,14 @@ export default async function BillingPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-medium">현재 플랜: {planLabel}</p>
-            <p className="text-black/60">상태: {statusLabel}</p>
+            <div className="flex flex-wrap items-center gap-2 text-black/60">
+              <span>상태: {statusLabel}</span>
+              {cancelAt && (
+                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
+                  해지 예약됨
+                </span>
+              )}
+            </div>
             <p className="text-black/60">
               리라이팅 {rewriteUsed}회 / {rewriteLimit}회
             </p>
@@ -101,6 +109,17 @@ export default async function BillingPage({
         <p className="mt-3 text-xs text-black/50">
           토스페이먼츠 정기결제는 테스트 키로 먼저 검증할 수 있습니다.
         </p>
+        <div className="mt-4 rounded-lg border border-black/5 bg-black/5 p-3 text-xs text-black/60">
+          <p className="font-medium text-black/80">해지 안내</p>
+          <p className="mt-1">
+            해지는 다음 결제일부터 반영되며, 만료일까지 모든 기능을 그대로
+            이용할 수 있습니다.
+          </p>
+          <p className="mt-1">
+            해지 후에는 자동결제가 중단되며, 필요 시 언제든 다시 구독할 수
+            있습니다.
+          </p>
+        </div>
       </div>
 
       <BillingCallback

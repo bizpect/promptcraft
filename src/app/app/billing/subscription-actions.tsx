@@ -15,6 +15,7 @@ export function SubscriptionActions({
   cancelAt,
 }: SubscriptionActionsProps) {
   const [loading, setLoading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
 
@@ -33,14 +34,7 @@ export function SubscriptionActions({
 
   const handleCancel = async () => {
     setMessage(null);
-    const confirmCancel = window.confirm(
-      "정말로 구독을 해지하시겠습니까? 만료일까지는 계속 이용할 수 있습니다."
-    );
-
-    if (!confirmCancel) {
-      return;
-    }
-
+    setConfirmOpen(false);
     setLoading(true);
 
     try {
@@ -53,7 +47,7 @@ export function SubscriptionActions({
         throw new Error(data.message || "구독 해지에 실패했습니다.");
       }
 
-      setMessage("구독 해지가 완료되었습니다.");
+      setMessage("구독 해지가 예약되었습니다. 만료일까지 이용 가능합니다.");
       router.refresh();
     } catch (error) {
       console.error("Failed to cancel subscription:", error);
@@ -72,15 +66,67 @@ export function SubscriptionActions({
   return (
     <div className="flex flex-col items-end gap-2 text-right">
       {resolvedCancelAt ? (
-        <div className="text-xs text-black/60">
-          해지 예약됨 · 만료일 {resolvedCancelAt}
-        </div>
+        <>
+          <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
+            해지 예약됨
+          </span>
+          <div className="text-xs text-black/60">
+            만료일 {resolvedCancelAt}까지 이용 가능
+          </div>
+        </>
       ) : (
-        <Button variant="ghost" onClick={handleCancel} disabled={loading}>
-          {loading ? "해지 처리 중..." : "구독 해지"}
+        <Button
+          variant="ghost"
+          onClick={() => setConfirmOpen(true)}
+          disabled={loading}
+        >
+          {loading ? "해지 예약 중..." : "구독 해지 예약"}
         </Button>
       )}
       {message && <p className="text-xs text-black/50">{message}</p>}
+
+      {confirmOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cancel-subscription-title"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setConfirmOpen(false);
+            }
+          }}
+        >
+          <div className="w-full max-w-sm rounded-xl bg-white p-5 text-left shadow-xl">
+            <h2
+              id="cancel-subscription-title"
+              className="text-base font-semibold"
+            >
+              구독 해지를 예약할까요?
+            </h2>
+            <p className="mt-2 text-sm text-black/70">
+              해지는 다음 결제일부터 반영됩니다. 만료일까지는 모든 기능을 그대로
+              이용할 수 있어요.
+            </p>
+            <p className="mt-2 text-xs text-black/50">
+              해지 후 자동결제는 중단되며, 언제든 다시 구독할 수 있습니다.
+            </p>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmOpen(false)}
+                disabled={loading}
+              >
+                닫기
+              </Button>
+              <Button size="sm" onClick={handleCancel} disabled={loading}>
+                {loading ? "처리 중..." : "해지 예약"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
