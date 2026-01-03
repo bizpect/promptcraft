@@ -74,7 +74,10 @@ export default async function BillingPage({
           테스트 결제는 토스 결제창에서 카드 등록 후 진행됩니다.
         </p>
         <div className="mt-4">
-          <BillingActions />
+          <BillingActions
+            currentPlanCode={subscription?.plan_code ?? null}
+            currentStatusCode={subscription?.status_code ?? null}
+          />
         </div>
       </div>
     </div>

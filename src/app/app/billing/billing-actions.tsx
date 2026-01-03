@@ -29,6 +29,11 @@ type PrepareResponse = {
   plan: PlanDetail;
 };
 
+type BillingActionsProps = {
+  currentPlanCode?: string | null;
+  currentStatusCode?: string | null;
+};
+
 declare global {
   interface Window {
     TossPayments?: (clientKey: string) => {
@@ -55,9 +60,24 @@ function formatPrice(price: number, currency: string) {
   return `${price.toLocaleString("ko-KR")} ${currency}`;
 }
 
-export function BillingActions() {
+function normalizePlanCode(value: string | null | undefined): PlanCode | null {
+  if (value === "pro" || value === "max") {
+    return value;
+  }
+
+  return null;
+}
+
+export function BillingActions({
+  currentPlanCode,
+  currentStatusCode,
+}: BillingActionsProps) {
   const [loadingPlan, setLoadingPlan] = useState<PlanCode | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const normalizedPlan = normalizePlanCode(currentPlanCode);
+  const isActive = currentStatusCode === "active";
+  const isMaxActive = isActive && normalizedPlan === "max";
+  const isProActive = isActive && normalizedPlan === "pro";
 
   const startBilling = async (planCode: PlanCode) => {
     setError(null);
@@ -102,41 +122,68 @@ export function BillingActions() {
     <div className="space-y-4">
       <Script src={scriptSrc} strategy="afterInteractive" />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
-          <p className="font-medium">Pro</p>
-          <p className="mt-1 text-black/60">리라이팅 20회/월</p>
-          <p className="mt-2 text-lg font-semibold">
-            {formatPrice(4900, "KRW")} / 월
+      {isMaxActive ? (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+          <p className="font-medium">Max 플랜을 이용 중입니다.</p>
+          <p className="mt-1 text-emerald-900/70">
+            현재 플랜이 최고 등급이라 추가 결제 옵션이 없습니다.
           </p>
-          <Button
-            className="mt-3"
-            onClick={() => startBilling("pro")}
-            disabled={loadingPlan !== null}
-          >
-            {loadingPlan === "pro"
-              ? "결제 진행 중..."
-              : `${billingLabel}로 Pro 시작`}
-          </Button>
         </div>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
+            <div className="flex items-center justify-between">
+              <p className="font-medium">Pro</p>
+              {isProActive && (
+                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs text-black/70">
+                  현재 이용 중
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-black/60">리라이팅 20회/월</p>
+            <p className="mt-2 text-lg font-semibold">
+              {formatPrice(4900, "KRW")} / 월
+            </p>
+            <Button
+              className="mt-3"
+              onClick={() => startBilling("pro")}
+              disabled={loadingPlan !== null || isProActive}
+            >
+              {isProActive
+                ? "이용 중"
+                : loadingPlan === "pro"
+                  ? "결제 진행 중..."
+                  : `${billingLabel}로 Pro 시작`}
+            </Button>
+          </div>
 
-        <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
-          <p className="font-medium">Max</p>
-          <p className="mt-1 text-black/60">리라이팅 100회/월</p>
-          <p className="mt-2 text-lg font-semibold">
-            {formatPrice(9900, "KRW")} / 월
-          </p>
-          <Button
-            className="mt-3"
-            onClick={() => startBilling("max")}
-            disabled={loadingPlan !== null}
-          >
-            {loadingPlan === "max"
-              ? "결제 진행 중..."
-              : `${billingLabel}로 Max 시작`}
-          </Button>
+          <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
+            <div className="flex items-center justify-between">
+              <p className="font-medium">Max</p>
+              {isActive && (
+                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs text-black/70">
+                  업그레이드
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-black/60">리라이팅 100회/월</p>
+            <p className="mt-2 text-lg font-semibold">
+              {formatPrice(9900, "KRW")} / 월
+            </p>
+            <Button
+              className="mt-3"
+              onClick={() => startBilling("max")}
+              disabled={loadingPlan !== null}
+            >
+              {loadingPlan === "max"
+                ? "결제 진행 중..."
+                : isProActive
+                  ? `${billingLabel}로 Max 업그레이드`
+                  : `${billingLabel}로 Max 시작`}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
