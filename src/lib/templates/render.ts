@@ -6,7 +6,7 @@ const TOKEN_MAP = [
   "constraints",
 ] as const;
 
-export type TemplateInput = Record<(typeof TOKEN_MAP)[number], string> &
+export type TemplateInput = Partial<Record<(typeof TOKEN_MAP)[number], string>> &
   Record<string, string>;
 
 export function renderBasePrompt(basePrompt: string, input: TemplateInput) {
