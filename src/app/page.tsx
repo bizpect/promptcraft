@@ -11,7 +11,7 @@ export default function HomePage() {
       <div className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-[var(--accent)]/20 blur-[140px] orb" />
       <div className="pointer-events-none absolute -right-24 top-40 h-80 w-80 rounded-full bg-[var(--accent-2)]/20 blur-[160px] orb orb--slow" />
 
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-7">
+      <header className="sticky top-0 z-40 mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-7">
         <div className="flex items-center gap-3 text-lg">
           <Sparkles className="h-4 w-4 text-[var(--accent)]" />
           <span className="text-sm uppercase tracking-[0.4em] text-white/70 font-[var(--font-playfair)]">
@@ -19,11 +19,11 @@ export default function HomePage() {
           </span>
         </div>
         <nav className="flex items-center gap-5 text-xs uppercase tracking-[0.32em] text-white/70">
-          <Link href="/pricing" className="transition hover:text-white">
+          <Link href="/pricing" className="nav-link transition hover:text-white">
             요금제
           </Link>
-          <PublicAuthLink className="transition hover:text-white" />
-          <Link href="/app/builder" className="transition hover:text-white">
+          <PublicAuthLink className="nav-link transition hover:text-white" />
+          <Link href="/app/builder" className="nav-link transition hover:text-white">
             빌더
           </Link>
         </nav>

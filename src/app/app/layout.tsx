@@ -18,7 +18,7 @@ export default async function AppLayout({
 
   return (
     <div className="app-shell">
-      <header className="border-b border-white/10 bg-black/60 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-5">
           <div className="flex items-center gap-4">
             <Link
@@ -32,16 +32,16 @@ export default async function AppLayout({
             </span>
           </div>
           <nav className="hidden items-center gap-6 text-xs uppercase tracking-[0.32em] text-white/60 md:flex">
-            <Link href="/app/builder" className="transition hover:text-white">
+            <Link href="/app/builder" className="nav-link transition hover:text-white">
               빌더
             </Link>
-            <Link href="/app/library" className="transition hover:text-white">
+            <Link href="/app/library" className="nav-link transition hover:text-white">
               라이브러리
             </Link>
-            <Link href="/app/billing" className="transition hover:text-white">
+            <Link href="/app/billing" className="nav-link transition hover:text-white">
               결제/플랜
             </Link>
-            <Link href="/app/profile" className="transition hover:text-white">
+            <Link href="/app/profile" className="nav-link transition hover:text-white">
               프로필
             </Link>
           </nav>
