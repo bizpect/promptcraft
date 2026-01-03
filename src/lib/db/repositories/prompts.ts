@@ -24,7 +24,7 @@ type PromptInsertResult = {
 type PromptListItem = {
   id: string;
   title: string;
-  platform_code: string;
+  platform_code: "sora" | "veo";
   output_prompt: string;
   created_at: string;
 };
@@ -33,7 +33,7 @@ type PromptDetail = {
   id: string;
   title: string;
   template_id: string | null;
-  platform_code: string;
+  platform_code: "sora" | "veo";
   input_json: Record<string, unknown>;
   output_prompt: string;
   created_at: string;
