@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { recordPaymentAttempt } from "@/lib/db";
+import { createBrowserSupabase } from "@/lib/supabase/client";
+
 type BillingCallbackProps = {
   authKey?: string;
   customerKey?: string;
@@ -31,6 +34,7 @@ export function BillingCallback({
     tone: "success" | "error" | "info";
   } | null>(null);
   const lastRequestKeyRef = useRef<string | null>(null);
+  const lastFailKeyRef = useRef<string | null>(null);
   const bannerRef = useRef<HTMLDivElement | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -50,6 +54,30 @@ export function BillingCallback({
         setStatus({
           message: "결제가 취소되었거나 실패했습니다.",
           tone: "error",
+        });
+
+        const normalizedPlanCode = normalizePlanCode(resolvedPlanCode);
+        if (!normalizedPlanCode) {
+          return;
+        }
+
+        const failKey = [normalizedPlanCode, resolvedOrderId ?? ""].join("|");
+        if (lastFailKeyRef.current === failKey) {
+          return;
+        }
+
+        lastFailKeyRef.current = failKey;
+        const supabase = createBrowserSupabase();
+        recordPaymentAttempt(supabase, {
+          planCode: normalizedPlanCode,
+          reasonCode: "redirect_fail",
+          providerCode: "toss",
+          metadata: {
+            source: "redirect",
+            order_id: resolvedOrderId ?? null,
+          },
+        }).catch((error) => {
+          console.warn("Failed to record payment attempt:", error);
         });
       }
       return;

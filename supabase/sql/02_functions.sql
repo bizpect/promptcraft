@@ -764,6 +764,68 @@ begin
 end;
 $$;
 
+create or replace function public.record_payment_attempt(
+  plan_code_input text,
+  reason_code_input text,
+  provider_code_input text default 'toss',
+  metadata_input jsonb default '{}'::jsonb
+)
+returns void language plpgsql security invoker as $$
+begin
+  if plan_code_input is null or reason_code_input is null then
+    return;
+  end if;
+
+  if not exists (
+    select 1
+    from public.common_codes as c
+    where c.code_group = 'subscription_plan'
+      and c.code = plan_code_input
+  ) then
+    return;
+  end if;
+
+  if not exists (
+    select 1
+    from public.common_codes as c
+    where c.code_group = 'payment_attempt_reason'
+      and c.code = reason_code_input
+  ) then
+    return;
+  end if;
+
+  if not exists (
+    select 1
+    from public.common_codes as c
+    where c.code_group = 'payment_provider'
+      and c.code = provider_code_input
+  ) then
+    return;
+  end if;
+
+  insert into public.payment_attempts (
+    user_id,
+    provider_group,
+    provider_code,
+    plan_group,
+    plan_code,
+    reason_group,
+    reason_code,
+    metadata
+  )
+  values (
+    auth.uid(),
+    'payment_provider',
+    provider_code_input,
+    'subscription_plan',
+    plan_code_input,
+    'payment_attempt_reason',
+    reason_code_input,
+    metadata_input
+  );
+end;
+$$;
+
 
 -- Users
 create or replace function public.record_login_event(login_type_input text)

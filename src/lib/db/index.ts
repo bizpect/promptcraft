@@ -29,6 +29,7 @@ export {
   applyBillingChargeSuccess,
   applyBillingChargeFailure,
   applyBillingKeyRevoked,
+  recordPaymentAttempt,
 } from "@/lib/db/repositories/billing";
 export { insertRewrite } from "@/lib/db/repositories/rewrites";
 export { fetchRewritesForPrompt } from "@/lib/db/repositories/rewrites";

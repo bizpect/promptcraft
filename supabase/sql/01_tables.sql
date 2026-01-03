@@ -127,6 +127,31 @@ create table if not exists public.payment_events (
     references public.common_codes (code_group, code)
 );
 
+create table if not exists public.payment_attempts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  provider_group text not null default 'payment_provider'
+    check (provider_group = 'payment_provider'),
+  provider_code text not null,
+  plan_group text not null default 'subscription_plan'
+    check (plan_group = 'subscription_plan'),
+  plan_code text not null,
+  reason_group text not null default 'payment_attempt_reason'
+    check (reason_group = 'payment_attempt_reason'),
+  reason_code text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  constraint payment_attempts_provider_fk
+    foreign key (provider_group, provider_code)
+    references public.common_codes (code_group, code),
+  constraint payment_attempts_plan_fk
+    foreign key (plan_group, plan_code)
+    references public.common_codes (code_group, code),
+  constraint payment_attempts_reason_fk
+    foreign key (reason_group, reason_code)
+    references public.common_codes (code_group, code)
+);
+
 create table if not exists public.templates (
   id uuid primary key default gen_random_uuid(),
   title text not null,

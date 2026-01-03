@@ -5,6 +5,7 @@ alter table public.subscriptions enable row level security;
 alter table public.billing_profiles enable row level security;
 alter table public.payments enable row level security;
 alter table public.payment_events enable row level security;
+alter table public.payment_attempts enable row level security;
 alter table public.templates enable row level security;
 alter table public.prompts enable row level security;
 alter table public.rewrites enable row level security;
@@ -38,6 +39,7 @@ grant select, update on public.subscriptions to authenticated;
 grant select, insert, update on public.billing_profiles to authenticated;
 grant select, insert, update on public.payments to authenticated;
 grant select, insert on public.payment_events to authenticated;
+grant select, insert on public.payment_attempts to authenticated;
 grant select, insert, update, delete on public.prompts to authenticated;
 grant select, insert on public.rewrites to authenticated;
 
@@ -112,6 +114,16 @@ create policy "payment_events_insert_own"
         and p.user_id = auth.uid()
     )
   );
+
+create policy "payment_attempts_select_own"
+  on public.payment_attempts
+  for select
+  using (user_id = auth.uid());
+
+create policy "payment_attempts_insert_own"
+  on public.payment_attempts
+  for insert
+  with check (user_id = auth.uid());
 
 create policy "templates_public_read"
   on public.templates

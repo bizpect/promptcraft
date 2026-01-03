@@ -4,6 +4,8 @@ import { useState } from "react";
 import Script from "next/script";
 
 import { Button } from "@/components/ui/button";
+import { recordPaymentAttempt } from "@/lib/db";
+import { createBrowserSupabase } from "@/lib/supabase/client";
 
 type PlanCode = "pro" | "max";
 
@@ -79,6 +81,37 @@ export function BillingActions({
   const isMaxActive = isActive && normalizedPlan === "max";
   const isProActive = isActive && normalizedPlan === "pro";
 
+  const recordAttempt = async (
+    planCode: PlanCode,
+    reasonCode: "user_cancel" | "validation_fail" | "client_error"
+  ) => {
+    try {
+      const supabase = createBrowserSupabase();
+      await recordPaymentAttempt(supabase, {
+        planCode,
+        reasonCode,
+        providerCode: "toss",
+        metadata: { source: "billing_auth" },
+      });
+    } catch (error) {
+      console.warn("Failed to record payment attempt:", error);
+    }
+  };
+
+  const resolveReasonCode = (error: unknown) => {
+    const code = (error as { code?: string } | null)?.code;
+
+    if (code === "USER_CANCEL") {
+      return "user_cancel" as const;
+    }
+
+    if (code && code.toLowerCase().includes("invalid")) {
+      return "validation_fail" as const;
+    }
+
+    return "client_error" as const;
+  };
+
   const startBilling = async (planCode: PlanCode) => {
     setError(null);
     setLoadingPlan(planCode);
@@ -112,6 +145,7 @@ export function BillingActions({
         failUrl: data.fail_url,
       });
     } catch (err) {
+      await recordAttempt(planCode, resolveReasonCode(err));
       setError(err instanceof Error ? err.message : "결제 요청 실패");
     } finally {
       setLoadingPlan(null);

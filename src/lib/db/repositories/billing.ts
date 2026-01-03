@@ -79,6 +79,13 @@ type BillingRevokeResult = {
   status_code: string | null;
 };
 
+type PaymentAttemptInput = {
+  planCode: string;
+  reasonCode: string;
+  providerCode?: string;
+  metadata?: Record<string, unknown>;
+};
+
 export async function fetchBillingProfile(supabase: SupabaseClient) {
   return supabase.rpc("get_billing_profile").returns<BillingProfile>().maybeSingle();
 }
@@ -173,4 +180,16 @@ export async function applyBillingKeyRevoked(
     })
     .returns<BillingRevokeResult>()
     .single();
+}
+
+export async function recordPaymentAttempt(
+  supabase: SupabaseClient,
+  input: PaymentAttemptInput
+) {
+  return supabase.rpc("record_payment_attempt", {
+    plan_code_input: input.planCode,
+    reason_code_input: input.reasonCode,
+    provider_code_input: input.providerCode ?? "toss",
+    metadata_input: input.metadata ?? {},
+  });
 }

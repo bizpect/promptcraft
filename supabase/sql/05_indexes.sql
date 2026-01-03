@@ -13,6 +13,9 @@ create index if not exists payments_user_id_created_at_idx
 create index if not exists payment_events_payment_id_received_at_idx
   on public.payment_events (payment_id, received_at desc);
 
+create index if not exists payment_attempts_user_id_created_at_idx
+  on public.payment_attempts (user_id, created_at desc);
+
 create index if not exists login_logs_user_id_created_at_idx
   on public.login_logs (user_id, created_at desc);
 

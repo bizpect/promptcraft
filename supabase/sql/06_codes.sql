@@ -18,6 +18,10 @@ values
   ('payment_status', 'paid', 'Paid', 2, '{}'::jsonb),
   ('payment_status', 'failed', 'Failed', 3, '{}'::jsonb),
   ('payment_status', 'canceled', 'Canceled', 4, '{}'::jsonb),
+  ('payment_attempt_reason', 'user_cancel', 'User canceled', 1, '{}'::jsonb),
+  ('payment_attempt_reason', 'validation_fail', 'Validation failed', 2, '{}'::jsonb),
+  ('payment_attempt_reason', 'client_error', 'Client error', 3, '{}'::jsonb),
+  ('payment_attempt_reason', 'redirect_fail', 'Redirect failed', 4, '{}'::jsonb),
   ('billing_status', 'active', 'Active', 1, '{}'::jsonb),
   ('billing_status', 'inactive', 'Inactive', 2, '{}'::jsonb),
   ('billing_status', 'revoked', 'Revoked', 3, '{}'::jsonb)
