@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { buttonVariants } from "@/components/ui/button";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
 
@@ -54,5 +54,19 @@ export default function LoginPage() {
         {loading ? "연결 중..." : "Google로 계속하기"}
       </button>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto flex min-h-screen w-full max-w-xl items-center px-6 py-16 text-sm text-black/70">
+          로그인 화면 불러오는 중...
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
