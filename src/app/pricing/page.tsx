@@ -14,14 +14,14 @@ const plans = [
   },
   {
     name: "Lite",
-    price: "₩19,000",
+    price: "₩4,900",
     description: "개인 제작자",
     limit: "리라이팅 20회",
     cta: "Lite 시작",
   },
   {
     name: "Pro",
-    price: "₩59,000",
+    price: "₩9,900",
     description: "팀/스튜디오",
     limit: "리라이팅 100회",
     cta: "Pro 시작",
