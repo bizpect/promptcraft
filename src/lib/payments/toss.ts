@@ -276,7 +276,7 @@ export async function revokeTossBillingKey(input: {
         : typeof result.data.code === "string"
           ? result.data.code
           : "";
-    if (result.status !== 404 && message) {
+    if (result.status !== 404 && result.status !== 405 && message) {
       const error = new Error(message);
       (error as Error & { payload?: Record<string, unknown> }).payload =
         result.data;
