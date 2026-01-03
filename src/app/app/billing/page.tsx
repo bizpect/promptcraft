@@ -105,6 +105,7 @@ export default async function BillingPage({
             currentStatusCode={subscription?.status_code ?? null}
             cancelAt={subscription?.cancel_at ?? null}
             currentPeriodEnd={subscription?.current_period_end ?? null}
+            currentPlanCode={subscription?.plan_code ?? null}
           />
         </div>
         <p className="mt-3 text-xs text-black/50">

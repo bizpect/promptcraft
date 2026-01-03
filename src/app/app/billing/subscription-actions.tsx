@@ -9,12 +9,14 @@ type SubscriptionActionsProps = {
   currentStatusCode: string | null;
   cancelAt: string | null;
   currentPeriodEnd: string | null;
+  currentPlanCode: string | null;
 };
 
 export function SubscriptionActions({
   currentStatusCode,
   cancelAt,
   currentPeriodEnd,
+  currentPlanCode,
 }: SubscriptionActionsProps) {
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -84,6 +86,10 @@ export function SubscriptionActions({
   };
 
   if (currentStatusCode !== "active") {
+    return null;
+  }
+
+  if (!currentPlanCode || currentPlanCode === "free") {
     return null;
   }
 
