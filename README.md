@@ -17,7 +17,7 @@ npm install
 
 ### Environment
 
-`.env.example`을 참고해 `.env.local`을 생성합니다.
+`.env.example`을 참고해 `.env.local`을 생성합니다. 
 
 ```bash
 cp .env.example .env.local
