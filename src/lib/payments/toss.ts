@@ -195,4 +195,39 @@ export async function fetchTossPaymentByKey(paymentKey: string) {
   return data as TossConfirmResponse & Record<string, unknown>;
 }
 
+export async function revokeTossBillingKey(input: {
+  billingKey: string;
+}) {
+  const { secretKey, apiBaseUrl } = getTossConfig();
+  const auth = Buffer.from(`${secretKey}:`).toString("base64");
+
+  const response = await fetch(
+    `${apiBaseUrl}/billing/authorizations/${input.billingKey}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Basic ${auth}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const data = (await response.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
+
+  if (!response.ok) {
+    const message =
+      typeof data.message === "string"
+        ? data.message
+        : "Toss billing key revoke failed";
+    const error = new Error(message);
+    (error as Error & { payload?: Record<string, unknown> }).payload = data;
+    throw error;
+  }
+
+  return data as Record<string, unknown>;
+}
+
 // webhook signature verification removed: Toss webhook secret not available

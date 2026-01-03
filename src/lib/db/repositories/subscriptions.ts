@@ -14,6 +14,9 @@ export type SubscriptionCore = {
 export type SubscriptionWithLabels = SubscriptionCore & {
   plan_label: string | null;
   status_label: string | null;
+  current_period_end: string | null;
+  cancel_requested_at: string | null;
+  cancel_at: string | null;
 };
 
 export async function fetchSubscriptionForUser(
@@ -29,6 +32,10 @@ export async function fetchSubscriptionWithLabels(
     .rpc("get_subscription_with_labels")
     .returns<SubscriptionWithLabels>()
     .maybeSingle();
+}
+
+export async function scheduleSubscriptionCancel(supabase: SupabaseClient) {
+  return supabase.rpc("schedule_subscription_cancel");
 }
 
 export async function updateSubscriptionRewriteUsed(

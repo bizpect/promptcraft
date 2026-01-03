@@ -45,6 +45,21 @@ type PaymentWebhookResult = {
   user_id: string | null;
 };
 
+export type UserPayment = {
+  id: string;
+  provider_code: string | null;
+  provider_label: string | null;
+  status_code: string | null;
+  status_label: string | null;
+  amount: number | null;
+  currency: string | null;
+  method: string | null;
+  order_id: string | null;
+  requested_at: string | null;
+  approved_at: string | null;
+  created_at: string | null;
+};
+
 export async function applyPaymentConfirmation(
   supabase: SupabaseClient,
   input: PaymentConfirmationInput
@@ -98,4 +113,8 @@ export async function createPaymentEvent(
     event_payload_input: input.eventPayload,
     provider_code_input: input.providerCode ?? "toss",
   });
+}
+
+export async function fetchUserPayments(supabase: SupabaseClient) {
+  return supabase.rpc("get_user_payments").returns<UserPayment[]>();
 }

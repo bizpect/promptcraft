@@ -1,8 +1,9 @@
-import { fetchSubscriptionWithLabels } from "@/lib/db";
+import { fetchSubscriptionWithLabels, fetchUserPayments } from "@/lib/db";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 import { BillingActions } from "@/app/app/billing/billing-actions";
 import { BillingCallback } from "@/app/app/billing/billing-callback";
+import { SubscriptionActions } from "@/app/app/billing/subscription-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function BillingPage({
 }) {
   const supabase = await createServerSupabase();
   const { data: subscription } = await fetchSubscriptionWithLabels(supabase);
+  const { data: payments } = await fetchUserPayments(supabase);
 
   const planLabel =
     subscription?.plan_label ?? subscription?.plan_code ?? "알 수 없음";
@@ -30,11 +32,43 @@ export default async function BillingPage({
     subscription?.status_label ?? subscription?.status_code ?? "알 수 없음";
   const rewriteUsed = subscription?.rewrite_used ?? 0;
   const rewriteLimit = subscription?.rewrite_limit ?? 0;
+  const currentPeriodEnd = subscription?.current_period_end ?? null;
   const authKey = searchParams?.authKey ?? searchParams?.auth_key;
   const customerKey = searchParams?.customerKey ?? searchParams?.customer_key;
   const planCode = searchParams?.plan;
   const result = searchParams?.result;
   const orderId = searchParams?.orderId;
+  const latestPayment = payments?.[0] ?? null;
+  const latestStatusCode = latestPayment?.status_code ?? null;
+  const latestStatusLabel = latestPayment?.status_label ?? latestStatusCode;
+  const hasLatestFailure =
+    latestStatusCode === "failed" || latestStatusCode === "canceled";
+
+  const formatDate = (value: string | null) => {
+    if (!value) {
+      return "알 수 없음";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "알 수 없음";
+    }
+
+    return date.toLocaleDateString("ko-KR");
+  };
+
+  const formatAmount = (amount: number | null, currency: string | null) => {
+    if (amount === null || amount === undefined) {
+      return "-";
+    }
+
+    const resolvedCurrency = currency ?? "KRW";
+    if (resolvedCurrency === "KRW") {
+      return `${amount.toLocaleString("ko-KR")}원`;
+    }
+
+    return `${amount.toLocaleString("ko-KR")} ${resolvedCurrency}`;
+  };
 
   return (
     <div className="space-y-6">
@@ -46,14 +80,21 @@ export default async function BillingPage({
       </div>
 
       <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-medium">현재 플랜: {planLabel}</p>
             <p className="text-black/60">상태: {statusLabel}</p>
             <p className="text-black/60">
               리라이팅 {rewriteUsed}회 / {rewriteLimit}회
             </p>
+            <p className="text-black/60">
+              만료일: {formatDate(currentPeriodEnd)}
+            </p>
           </div>
+          <SubscriptionActions
+            currentStatusCode={subscription?.status_code ?? null}
+            cancelAt={subscription?.cancel_at ?? null}
+          />
         </div>
         <p className="mt-3 text-xs text-black/50">
           토스페이먼츠 정기결제는 테스트 키로 먼저 검증할 수 있습니다.
@@ -79,6 +120,62 @@ export default async function BillingPage({
             currentStatusCode={subscription?.status_code ?? null}
           />
         </div>
+      </div>
+
+      <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
+        <div className="flex items-center justify-between">
+          <p className="font-medium">결제 내역</p>
+          {hasLatestFailure && (
+            <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700">
+              최근 결제 실패: {latestStatusLabel ?? "실패"}
+            </span>
+          )}
+        </div>
+        <div className="mt-3 space-y-3">
+          {payments && payments.length > 0 ? (
+            payments.slice(0, 5).map((payment) => {
+              const paymentDate = payment.approved_at ?? payment.created_at;
+              const statusTone =
+                payment.status_code === "paid"
+                  ? "text-emerald-700"
+                  : payment.status_code === "failed" ||
+                      payment.status_code === "canceled"
+                    ? "text-red-700"
+                    : "text-black/60";
+
+              return (
+                <div
+                  key={payment.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/5 bg-black/5 p-3"
+                >
+                  <div>
+                    <p className="font-medium">
+                      {payment.provider_label ?? payment.provider_code ?? "결제"}
+                    </p>
+                    <p className="text-xs text-black/50">
+                      {payment.order_id ?? "-"} · {formatDate(paymentDate)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">
+                      {formatAmount(payment.amount, payment.currency)}
+                    </p>
+                    <p className={`text-xs ${statusTone}`}>
+                      {payment.status_label ?? payment.status_code ?? "-"}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-xs text-black/50">
+              아직 결제 내역이 없습니다.
+            </p>
+          )}
+        </div>
+        <p className="mt-3 text-xs text-black/50">
+          최근 5건만 표시됩니다.
+        </p>
       </div>
     </div>
   );

@@ -52,6 +52,8 @@ create table if not exists public.subscriptions (
   rewrite_used integer not null default 0,
   rewrite_limit integer not null default 0,
   current_period_end timestamptz,
+  cancel_requested_at timestamptz,
+  cancel_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint subscriptions_plan_fk

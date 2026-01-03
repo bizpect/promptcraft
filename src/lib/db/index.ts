@@ -15,11 +15,13 @@ export {
   fetchSubscriptionForUser,
   fetchSubscriptionWithLabels,
   updateSubscriptionRewriteUsed,
+  scheduleSubscriptionCancel,
 } from "@/lib/db/repositories/subscriptions";
 export {
   applyPaymentConfirmation,
   applyPaymentWebhook,
   createPaymentEvent,
+  fetchUserPayments,
 } from "@/lib/db/repositories/payments";
 export {
   fetchBillingProfile,

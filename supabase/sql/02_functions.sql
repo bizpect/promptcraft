@@ -220,7 +220,10 @@ returns table (
   status_code text,
   status_label text,
   rewrite_used integer,
-  rewrite_limit integer
+  rewrite_limit integer,
+  current_period_end timestamptz,
+  cancel_requested_at timestamptz,
+  cancel_at timestamptz
 ) language sql security invoker as $$
   select
     s.plan_code,
@@ -228,7 +231,10 @@ returns table (
     s.status_code,
     status.label as status_label,
     s.rewrite_used,
-    s.rewrite_limit
+    s.rewrite_limit,
+    s.current_period_end,
+    s.cancel_requested_at,
+    s.cancel_at
   from public.subscriptions as s
   left join public.common_codes as plan
     on plan.code_group = s.plan_group
@@ -237,6 +243,63 @@ returns table (
     on status.code_group = s.status_group
    and status.code = s.status_code
   where s.user_id = auth.uid();
+$$;
+
+create or replace function public.schedule_subscription_cancel()
+returns void language plpgsql security invoker as $$
+begin
+  update public.subscriptions
+  set
+    cancel_requested_at = now(),
+    cancel_at = coalesce(current_period_end, now()),
+    updated_at = now()
+  where user_id = auth.uid();
+
+  update public.billing_profiles
+  set
+    status_code = 'revoked',
+    updated_at = now()
+  where user_id = auth.uid();
+end;
+$$;
+
+create or replace function public.get_user_payments()
+returns table (
+  id uuid,
+  provider_code text,
+  provider_label text,
+  status_code text,
+  status_label text,
+  amount integer,
+  currency text,
+  method text,
+  order_id text,
+  requested_at timestamptz,
+  approved_at timestamptz,
+  created_at timestamptz
+) language sql security invoker as $$
+  select
+    p.id,
+    p.provider_code,
+    provider.label as provider_label,
+    p.status_code,
+    status.label as status_label,
+    p.amount,
+    p.currency,
+    p.method,
+    p.order_id,
+    p.requested_at,
+    p.approved_at,
+    p.created_at
+  from public.payments as p
+  left join public.common_codes as provider
+    on provider.code_group = p.provider_group
+   and provider.code = p.provider_code
+  left join public.common_codes as status
+    on status.code_group = p.status_group
+   and status.code = p.status_code
+  where p.user_id = auth.uid()
+  order by coalesce(p.approved_at, p.created_at) desc;
 $$;
 
 
