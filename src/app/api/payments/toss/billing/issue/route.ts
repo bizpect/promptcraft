@@ -23,6 +23,14 @@ const schema = z.object({
   order_id: z.string().min(1).optional(),
 });
 
+const planSchema = z.object({
+  plan_code: z.string().optional(),
+  plan_label: z.string().nullable().optional(),
+  price: z.number().int().nonnegative().optional(),
+  currency: z.string().optional(),
+  rewrite_limit: z.number().int().optional(),
+});
+
 function extractCardSummary(response: Record<string, unknown>) {
   const card = response.card as Record<string, unknown> | undefined;
   const number = card?.number;
@@ -89,6 +97,12 @@ export async function POST(request: Request) {
     return errorResponse("plan_not_found", "플랜 정보를 찾을 수 없습니다.", 404);
   }
 
+  const parsedPlan = planSchema.safeParse(plan);
+
+  if (!parsedPlan.success) {
+    return errorResponse("plan_invalid", "플랜 정보가 올바르지 않습니다.", 500);
+  }
+
   const { data: billingProfile, error: billingError } =
     await upsertBillingProfile(supabase, {
       providerCode: "toss",
@@ -108,9 +122,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const amount = plan.price ?? 0;
+  const amount = parsedPlan.data.price ?? 0;
   const orderId = order_id ?? `sub_${plan_code}_${randomUUID()}`;
-  const orderName = `PromptCraft ${plan.plan_label ?? plan_code}`;
+  const orderName = `PromptCraft ${parsedPlan.data.plan_label ?? plan_code}`;
 
   try {
     const charged = await chargeTossBillingKey({
@@ -154,7 +168,7 @@ export async function POST(request: Request) {
       orderId,
       paymentKey: null,
       amount,
-      currency: plan.currency ?? "KRW",
+      currency: parsedPlan.data.currency ?? "KRW",
       rawResponse:
         error instanceof Error
           ? { message: error.message }
