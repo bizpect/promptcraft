@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type BillingCallbackProps = {
   authKey?: string;
@@ -10,6 +11,14 @@ type BillingCallbackProps = {
   orderId?: string;
 };
 
+function normalizePlanCode(value: string | null | undefined) {
+  if (value === "pro" || value === "max") {
+    return value;
+  }
+
+  return null;
+}
+
 export function BillingCallback({
   authKey,
   customerKey,
@@ -18,12 +27,40 @@ export function BillingCallback({
   orderId,
 }: BillingCallbackProps) {
   const [status, setStatus] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const resolvedParams = useMemo(() => {
+    if (authKey || customerKey || result || planCode || orderId) {
+      return {
+        authKey,
+        customerKey,
+        result,
+        planCode,
+        orderId,
+      };
+    }
+
+    return {
+      authKey: searchParams.get("authKey") ?? searchParams.get("auth_key"),
+      customerKey:
+        searchParams.get("customerKey") ?? searchParams.get("customer_key"),
+      result: searchParams.get("result"),
+      planCode: searchParams.get("plan"),
+      orderId: searchParams.get("orderId"),
+    };
+  }, [authKey, customerKey, orderId, planCode, result, searchParams]);
 
   useEffect(() => {
-    if (!authKey || !customerKey) {
-      if (result === "fail") {
+    if (!resolvedParams.authKey || !resolvedParams.customerKey) {
+      if (resolvedParams.result === "fail") {
         setStatus("결제가 취소되었거나 실패했습니다.");
       }
+      return;
+    }
+
+    const normalizedPlanCode = normalizePlanCode(resolvedParams.planCode);
+
+    if (!normalizedPlanCode) {
+      setStatus("플랜 정보가 없어 결제를 진행할 수 없습니다.");
       return;
     }
 
@@ -34,10 +71,10 @@ export function BillingCallback({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          auth_key: authKey,
-          customer_key: customerKey,
-          plan_code: planCode ?? "pro",
-          order_id: orderId,
+          auth_key: resolvedParams.authKey,
+          customer_key: resolvedParams.customerKey,
+          plan_code: normalizedPlanCode,
+          order_id: resolvedParams.orderId,
         }),
       });
       const data = await response.json();
@@ -51,7 +88,7 @@ export function BillingCallback({
     };
 
     void sendIssue();
-  }, [authKey, customerKey, planCode, result]);
+  }, [resolvedParams]);
 
   if (!status) {
     return null;

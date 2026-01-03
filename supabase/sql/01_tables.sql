@@ -1,3 +1,18 @@
+
+create table if not exists public.common_codes (
+  id uuid primary key default gen_random_uuid(),
+  code_group text not null,
+  code text not null,
+  label text not null,
+  description text,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (code_group, code)
+);
+
 create table if not exists public.users (
   id uuid primary key references auth.users (id) on delete cascade,
   email text unique,
@@ -25,19 +40,6 @@ create table if not exists public.login_logs (
     references public.common_codes (code_group, code)
 );
 
-create table if not exists public.common_codes (
-  id uuid primary key default gen_random_uuid(),
-  code_group text not null,
-  code text not null,
-  label text not null,
-  description text,
-  sort_order integer not null default 0,
-  is_active boolean not null default true,
-  metadata jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  unique (code_group, code)
-);
 
 create table if not exists public.subscriptions (
   user_id uuid primary key references auth.users (id) on delete cascade,

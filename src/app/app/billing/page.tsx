@@ -4,6 +4,8 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { BillingActions } from "@/app/app/billing/billing-actions";
 import { BillingCallback } from "@/app/app/billing/billing-callback";
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = {
   result?: string;
   authKey?: string;
