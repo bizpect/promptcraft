@@ -43,7 +43,8 @@ export async function POST(request: Request) {
   const signatureHeader =
     request.headers.get("toss-signature") ??
     request.headers.get("x-toss-signature") ??
-    request.headers.get("toss-webhook-signature");
+    request.headers.get("toss-webhook-signature") ??
+    request.headers.get("x-toss-webhook-signature");
 
   if (!webhookSecret) {
     return errorResponse(

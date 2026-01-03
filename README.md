@@ -60,6 +60,7 @@ supabase secrets set \
 
 4) Vercel Cron/외부 호출 보호
 - `/api/cron/billing-charge` 호출 시 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>` 필요
+- `vercel.json`에 Cron 헤더가 설정되어 있으니 `CRON_SECRET` 환경 변수를 추가하세요.
 
 ### Run
 
