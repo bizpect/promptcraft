@@ -52,7 +52,7 @@ export default function PricingPage() {
           <div
             key={plan.name}
             className={`relative overflow-hidden rounded-[26px] border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-1 hover:border-white/30 ${
-              index === 1 ? "pt-10 shadow-[0_20px_60px_rgba(242,180,92,0.2)]" : ""
+              index === 1 ? "shadow-[0_20px_60px_rgba(242,180,92,0.2)]" : ""
             }`}
           >
             <div className="flex items-start justify-between gap-4">
