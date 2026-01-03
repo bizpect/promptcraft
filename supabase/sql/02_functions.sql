@@ -433,6 +433,7 @@ create or replace function public.apply_payment_webhook(
   approved_at_input timestamptz,
   raw_response_input jsonb,
   event_type_input text,
+  event_key_input text,
   provider_code_input text default 'toss'
 )
 returns table (
@@ -443,6 +444,7 @@ returns table (
 declare
   resolved_payment_id uuid;
   resolved_user_id uuid;
+  existing_event_id uuid;
 begin
   select p.id, p.user_id
     into resolved_payment_id, resolved_user_id
@@ -451,6 +453,21 @@ begin
      or (payment_key_input is not null and p.payment_key = payment_key_input)
   order by p.created_at desc
   limit 1;
+
+  if event_key_input is not null then
+    select e.id
+      into existing_event_id
+    from public.payment_events as e
+    where e.provider_code = provider_code_input
+      and e.event_key = event_key_input
+    limit 1;
+
+    if existing_event_id is not null then
+      return query
+      select resolved_payment_id, status_code_input, resolved_user_id;
+      return;
+    end if;
+  end if;
 
   if resolved_payment_id is not null then
     update public.payments
@@ -470,14 +487,19 @@ begin
       payment_id,
       provider_code,
       event_type,
+      event_key,
       event_payload
     )
     values (
       resolved_payment_id,
       provider_code_input,
       coalesce(event_type_input, 'unknown'),
+      event_key_input,
       coalesce(raw_response_input, '{}'::jsonb)
-    );
+    )
+    on conflict (provider_code, event_key)
+      where event_key is not null
+      do nothing;
 
     if status_code_input = 'paid' then
       update public.subscriptions
@@ -503,14 +525,19 @@ begin
       payment_id,
       provider_code,
       event_type,
+      event_key,
       event_payload
     )
     values (
       null,
       provider_code_input,
       coalesce(event_type_input, 'unknown'),
+      event_key_input,
       coalesce(raw_response_input, '{}'::jsonb)
-    );
+    )
+    on conflict (provider_code, event_key)
+      where event_key is not null
+      do nothing;
   end if;
 
   return query

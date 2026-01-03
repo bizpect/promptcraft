@@ -122,6 +122,7 @@ create table if not exists public.payment_events (
     check (provider_group = 'payment_provider'),
   provider_code text not null,
   event_type text not null,
+  event_key text,
   event_payload jsonb not null default '{}'::jsonb,
   received_at timestamptz not null default now(),
   constraint payment_events_provider_fk

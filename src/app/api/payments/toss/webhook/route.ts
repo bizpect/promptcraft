@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHash, createHmac, timingSafeEqual } from "crypto";
 
 import { errorResponse } from "@/lib/api/response";
 import { applyBillingKeyRevoked, applyPaymentWebhook } from "@/lib/db";
@@ -109,6 +109,16 @@ export async function POST(request: Request) {
     typeof data.orderId === "string" ? data.orderId : null;
   const paymentKey =
     typeof data.paymentKey === "string" ? data.paymentKey : null;
+  const eventId =
+    typeof data.eventId === "string"
+      ? data.eventId
+      : typeof data.event_id === "string"
+        ? data.event_id
+        : typeof payload.eventId === "string"
+          ? payload.eventId
+          : typeof payload.event_id === "string"
+            ? payload.event_id
+            : null;
 
   if (eventType?.toUpperCase() === "BILLING_DELETED") {
     const customerKey =
@@ -163,6 +173,11 @@ export async function POST(request: Request) {
     );
   }
 
+  const payloadHash = createHash("sha256").update(rawBody).digest("hex");
+  const eventKey =
+    eventId ??
+    [eventType, paymentKey, orderId, payloadHash].filter(Boolean).join(":");
+
   try {
     const verified = await fetchTossPaymentByKey(paymentKey);
     status = typeof verified.status === "string" ? verified.status : status;
@@ -201,6 +216,7 @@ export async function POST(request: Request) {
     approvedAt,
     rawResponse: payload,
     eventType,
+    eventKey,
   });
 
   if (error) {

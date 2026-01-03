@@ -58,9 +58,8 @@ supabase secrets set \
 - Function: `billing-charge`
 - Schedule: `0 0 * * *` (매일 00:00 UTC, 필요 시 변경)
 
-4) Vercel Cron/외부 호출 보호
-- Vercel Cron은 `User-Agent: vercel-cron`으로 호출됩니다.
-- 외부 수동 호출 시 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>` 필요
+- 4) Cron 호출 보호
+- `/api/cron/billing-charge` 호출 시 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>` 필요
 - `CRON_SECRET` 환경 변수를 추가하세요.
 
 5) Toss 웹훅 서명 검증

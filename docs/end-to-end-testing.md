@@ -4,7 +4,7 @@
 - `.env.local`, Vercel, Supabase secrets 환경 변수 설정 완료
 - Supabase SQL 00~06 순서대로 적용 완료
 - Edge Function `billing-charge` 배포 완료
-- Vercel Cron 라우트 `/api/cron/billing-charge` 배포 완료
+- `/api/cron/billing-charge` 호출 시 `CRON_SECRET` 설정 완료
 
 ## 인증
 1. Google OAuth 로그인 성공 후 `/app` 이동
@@ -50,7 +50,7 @@
 3. `payments.status_code = failed`
 
 ## Cron 자동결제
-1. `/api/cron/billing-charge` 호출
+1. `/api/cron/billing-charge` 호출 (헤더 `Authorization: Bearer <CRON_SECRET>` 또는 `x-cron-secret: <CRON_SECRET>`)
 2. 응답 `ok: true` 확인
 3. 대상 구독 결제 생성
 4. `current_period_end` 30일 연장

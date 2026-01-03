@@ -7,6 +7,10 @@ create index if not exists rewrites_user_id_created_at_idx
 create index if not exists billing_profiles_user_id_idx
   on public.billing_profiles (user_id);
 
+create unique index if not exists payment_events_provider_event_key_idx
+  on public.payment_events (provider_code, event_key)
+  where event_key is not null;
+
 create index if not exists payments_user_id_created_at_idx
   on public.payments (user_id, created_at desc);
 

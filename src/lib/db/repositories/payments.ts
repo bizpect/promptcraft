@@ -29,6 +29,7 @@ type PaymentWebhookInput = {
   approvedAt?: string | null;
   rawResponse: Record<string, unknown>;
   eventType?: string | null;
+  eventKey?: string | null;
   providerCode?: string;
 };
 
@@ -102,6 +103,7 @@ export async function applyPaymentWebhook(
       approved_at_input: input.approvedAt ?? null,
       raw_response_input: input.rawResponse,
       event_type_input: input.eventType ?? null,
+      event_key_input: input.eventKey ?? null,
       provider_code_input: input.providerCode ?? "toss",
     })
     .returns<PaymentWebhookResult>()
