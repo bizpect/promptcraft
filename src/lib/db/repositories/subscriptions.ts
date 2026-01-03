@@ -38,6 +38,10 @@ export async function scheduleSubscriptionCancel(supabase: SupabaseClient) {
   return supabase.rpc("schedule_subscription_cancel");
 }
 
+export async function undoSubscriptionCancel(supabase: SupabaseClient) {
+  return supabase.rpc("undo_subscription_cancel");
+}
+
 export async function updateSubscriptionRewriteUsed(
   supabase: SupabaseClient,
   rewriteUsed: number

@@ -263,6 +263,25 @@ begin
 end;
 $$;
 
+create or replace function public.undo_subscription_cancel()
+returns void language plpgsql security invoker as $$
+begin
+  update public.subscriptions
+  set
+    cancel_requested_at = null,
+    cancel_at = null,
+    updated_at = now()
+  where user_id = auth.uid();
+
+  update public.billing_profiles
+  set
+    status_code = 'active',
+    updated_at = now()
+  where user_id = auth.uid()
+    and status_code = 'revoked';
+end;
+$$;
+
 create or replace function public.get_user_payments()
 returns table (
   id uuid,

@@ -16,6 +16,7 @@ export {
   fetchSubscriptionWithLabels,
   updateSubscriptionRewriteUsed,
   scheduleSubscriptionCancel,
+  undoSubscriptionCancel,
 } from "@/lib/db/repositories/subscriptions";
 export {
   applyPaymentConfirmation,

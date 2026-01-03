@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 type SubscriptionActionsProps = {
   currentStatusCode: string | null;
   cancelAt: string | null;
+  currentPeriodEnd: string | null;
 };
 
 export function SubscriptionActions({
   currentStatusCode,
   cancelAt,
+  currentPeriodEnd,
 }: SubscriptionActionsProps) {
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -57,11 +59,36 @@ export function SubscriptionActions({
     }
   };
 
+  const handleUndoCancel = async () => {
+    setMessage(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/subscriptions/cancel", {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "해지 예약을 취소할 수 없습니다.");
+      }
+
+      setMessage("해지 예약이 취소되었습니다.");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to undo cancellation:", error);
+      setMessage("해지 예약 취소에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (currentStatusCode !== "active") {
     return null;
   }
 
   const resolvedCancelAt = formatDate(cancelAt);
+  const resolvedPeriodEnd = formatDate(currentPeriodEnd) ?? "알 수 없음";
 
   return (
     <div className="flex flex-col items-end gap-2 text-right">
@@ -73,6 +100,14 @@ export function SubscriptionActions({
           <div className="text-xs text-black/60">
             만료일 {resolvedCancelAt}까지 이용 가능
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleUndoCancel}
+            disabled={loading}
+          >
+            {loading ? "처리 중..." : "해지 예약 취소"}
+          </Button>
         </>
       ) : (
         <Button
@@ -108,6 +143,14 @@ export function SubscriptionActions({
               해지는 다음 결제일부터 반영됩니다. 만료일까지는 모든 기능을 그대로
               이용할 수 있어요.
             </p>
+            <p className="mt-2 text-xs text-black/60">
+              만료일 {resolvedPeriodEnd}
+            </p>
+            {resolvedCancelAt && (
+              <p className="mt-2 text-xs text-black/60">
+                만료일 {resolvedCancelAt}
+              </p>
+            )}
             <p className="mt-2 text-xs text-black/50">
               해지 후 자동결제는 중단되며, 언제든 다시 구독할 수 있습니다.
             </p>
