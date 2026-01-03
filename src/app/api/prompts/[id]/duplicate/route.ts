@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { errorResponse } from "@/lib/api/response";
@@ -15,10 +15,10 @@ const bodySchema = z.object({
 });
 
 export async function POST(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  const params = context.params;
+  const params = await context.params;
   const parsedParams = paramsSchema.safeParse(params);
 
   if (!parsedParams.success) {

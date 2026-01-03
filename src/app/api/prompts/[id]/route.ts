@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { errorResponse } from "@/lib/api/response";
 import {
@@ -19,10 +19,10 @@ const updateSchema = z.object({
 });
 
 export async function GET(
-  _request: Request,
-  context: { params: { id: string } }
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  const params = context.params;
+  const params = await context.params;
   const parsed = paramsSchema.safeParse(params);
 
   if (!parsed.success) {
@@ -52,10 +52,10 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  const params = context.params;
+  const params = await context.params;
   const parsedParams = paramsSchema.safeParse(params);
 
   if (!parsedParams.success) {
@@ -93,10 +93,10 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
-  context: { params: { id: string } }
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
-  const params = context.params;
+  const params = await context.params;
   const parsed = paramsSchema.safeParse(params);
 
   if (!parsed.success) {
