@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { errorResponse } from "@/lib/api/response";
 import { fetchActiveTemplatesForPlatform } from "@/lib/db";
+import { ensureArray } from "@/lib/db/repositories/guards";
 import { logSupabaseError } from "@/lib/supabase/errors";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -31,5 +32,5 @@ export async function GET(request: Request) {
     return errorResponse("template_fetch_failed", "템플릿 조회 실패", 500);
   }
 
-  return NextResponse.json({ templates: data ?? [] });
+  return NextResponse.json({ templates: ensureArray(data) });
 }

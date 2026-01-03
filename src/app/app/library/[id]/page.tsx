@@ -5,6 +5,7 @@ import { PromptActions } from "@/components/library/prompt-actions";
 import { PromptMetaActions } from "@/components/library/prompt-meta-actions";
 import { ErrorState } from "@/components/ui/error-state";
 import { fetchPromptDetailForUser, fetchRewritesForPrompt } from "@/lib/db";
+import { ensureArray } from "@/lib/db/repositories/guards";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 function formatDate(value: string) {
@@ -24,6 +25,7 @@ export default async function LibraryDetailPage({
   const supabase = await createServerSupabase();
   const { data: prompt } = await fetchPromptDetailForUser(supabase, id);
   const { data: rewrites } = await fetchRewritesForPrompt(supabase, id);
+  const rewriteList = ensureArray(rewrites);
 
   if (!prompt) {
     return (
@@ -77,9 +79,9 @@ export default async function LibraryDetailPage({
 
       <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
         <p className="font-medium">리라이팅 히스토리</p>
-        {rewrites && rewrites.length > 0 ? (
+        {rewriteList.length > 0 ? (
           <div className="mt-3 space-y-3">
-            {rewrites.map((rewrite) => (
+            {rewriteList.map((rewrite) => (
               <div
                 key={rewrite.id}
                 className="rounded-lg border border-black/10 bg-black/5 p-3"

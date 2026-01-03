@@ -4,6 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { fetchUserPrompts } from "@/lib/db";
+import { ensureArray } from "@/lib/db/repositories/guards";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 function formatDate(value: string) {
@@ -17,7 +18,8 @@ function formatDate(value: string) {
 export default async function LibraryPage() {
   const supabase = await createServerSupabase();
   const { data: prompts, error } = await fetchUserPrompts(supabase);
-  const hasPrompts = !!prompts?.length;
+  const promptList = ensureArray(prompts);
+  const hasPrompts = promptList.length > 0;
 
   return (
     <div className="space-y-6">
@@ -35,7 +37,7 @@ export default async function LibraryPage() {
         />
       ) : hasPrompts ? (
         <div className="grid gap-4">
-          {prompts.map((prompt) => (
+          {promptList.map((prompt) => (
             <div
               key={prompt.id}
               className="rounded-xl border border-black/10 bg-white p-5 text-sm"
