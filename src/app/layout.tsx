@@ -14,7 +14,7 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "PromptCraft",
+  title: "PromVert",
   description: "Sora/Veo 프롬프트 빌더 SaaS MVP",
 };
 

@@ -15,7 +15,7 @@ export default function HomePage() {
         <div className="flex items-center gap-3 text-lg">
           <Sparkles className="h-4 w-4 text-[var(--accent)]" />
           <span className="text-sm uppercase tracking-[0.4em] text-white/70 font-[var(--font-playfair)]">
-            PromptCraft
+            PromVert
           </span>
         </div>
         <nav className="flex items-center gap-5 text-xs uppercase tracking-[0.32em] text-white/70">

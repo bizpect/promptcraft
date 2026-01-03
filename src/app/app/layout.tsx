@@ -25,7 +25,7 @@ export default async function AppLayout({
               href="/"
               className="text-xs uppercase tracking-[0.35em] text-white/70 font-[var(--font-playfair)]"
             >
-              PromptCraft
+              PromVert
             </Link>
             <span className="hidden text-[11px] uppercase tracking-[0.35em] text-white/40 md:inline">
               Workspace

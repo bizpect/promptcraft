@@ -64,8 +64,8 @@ export async function POST(request: Request) {
       : `billing_auth_${plan_code}_${randomUUID()}`;
   const orderName =
     resolvedMode === "update"
-      ? `PromptCraft ${parsedPlan.data.plan_label ?? plan_code} 결제수단 변경`
-      : `PromptCraft ${
+      ? `PromVert ${parsedPlan.data.plan_label ?? plan_code} 결제수단 변경`
+      : `PromVert ${
           parsedPlan.data.plan_label ?? parsedPlan.data.plan_code ?? plan_code
         }`;
   const amount = parsedPlan.data.price ?? 0;

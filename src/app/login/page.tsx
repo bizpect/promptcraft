@@ -60,7 +60,7 @@ function LoginContent() {
           Google로 계속하기
         </button>
         <p className="text-xs text-white/50">
-          로그인 시 PromptCraft의 서비스 약관 및 개인정보 처리방침에 동의합니다.
+          로그인 시 PromVert의 서비스 약관 및 개인정보 처리방침에 동의합니다.
         </p>
       </div>
       <LoadingOverlay show={loading} />

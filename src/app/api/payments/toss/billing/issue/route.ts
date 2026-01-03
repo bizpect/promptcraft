@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
   const amount = parsedPlan.data.price ?? 0;
   const orderId = order_id ?? `sub_${plan_code}_${randomUUID()}`;
-  const orderName = `PromptCraft ${parsedPlan.data.plan_label ?? plan_code}`;
+  const orderName = `PromVert ${parsedPlan.data.plan_label ?? plan_code}`;
 
   try {
     const charged = await chargeTossBillingKey({

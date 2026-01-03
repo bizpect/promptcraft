@@ -46,3 +46,6 @@
   - `supabase/sql/04_rls.sql`
   - `supabase/sql/05_indexes.sql`
   - `supabase/sql/06_codes.sql`
+
+## 브랜드 노트
+- 사용자 노출명: PromVert (합성어: Prompt + Convert).
