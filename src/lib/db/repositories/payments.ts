@@ -34,6 +34,17 @@ type PaymentEventInput = {
   providerCode?: string;
 };
 
+type PaymentConfirmationResult = {
+  payment_id: string | null;
+  status_code: string | null;
+};
+
+type PaymentWebhookResult = {
+  payment_id: string | null;
+  payment_status: string | null;
+  user_id: string | null;
+};
+
 export async function applyPaymentConfirmation(
   supabase: SupabaseClient,
   input: PaymentConfirmationInput
@@ -51,6 +62,7 @@ export async function applyPaymentConfirmation(
       plan_code_input: input.planCode,
       provider_code_input: input.providerCode ?? "toss",
     })
+    .returns<PaymentConfirmationResult>()
     .single();
 }
 
@@ -72,6 +84,7 @@ export async function applyPaymentWebhook(
       event_type_input: input.eventType ?? null,
       provider_code_input: input.providerCode ?? "toss",
     })
+    .returns<PaymentWebhookResult>()
     .single();
 }
 

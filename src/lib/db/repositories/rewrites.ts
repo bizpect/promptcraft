@@ -10,6 +10,16 @@ type InsertRewriteInput = {
   tokensOut?: number | null;
 };
 
+type RewriteListItem = {
+  id: string;
+  rewritten_prompt: string;
+  source_prompt: string | null;
+  provider_code: string;
+  tokens_in: number | null;
+  tokens_out: number | null;
+  created_at: string;
+};
+
 export async function insertRewrite(
   supabase: SupabaseClient,
   input: InsertRewriteInput
@@ -31,5 +41,5 @@ export async function fetchRewritesForPrompt(
 ) {
   return supabase.rpc("get_rewrites_for_prompt", {
     prompt_id: promptId,
-  });
+  }).returns<RewriteListItem[]>();
 }

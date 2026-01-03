@@ -34,8 +34,47 @@ type BillingChargeFailureInput = {
   providerCode?: string;
 };
 
+type BillingProfile = {
+  user_id: string;
+  provider_code: string;
+  status_code: string;
+  customer_key: string;
+  billing_key: string;
+  card_summary: string | null;
+  updated_at: string;
+};
+
+type PlanDetail = {
+  plan_code: string;
+  plan_label: string | null;
+  price: number;
+  currency: string;
+  rewrite_limit: number;
+};
+
+type DueSubscription = {
+  user_id: string;
+  plan_code: string;
+  price: number;
+  currency: string;
+  rewrite_limit: number;
+  current_period_end: string;
+  billing_key: string;
+  customer_key: string;
+};
+
+type PaymentResult = {
+  payment_id: string | null;
+  status_code: string | null;
+};
+
+type BillingRevokeResult = {
+  user_id: string | null;
+  status_code: string | null;
+};
+
 export async function fetchBillingProfile(supabase: SupabaseClient) {
-  return supabase.rpc("get_billing_profile").maybeSingle();
+  return supabase.rpc("get_billing_profile").returns<BillingProfile>().maybeSingle();
 }
 
 export async function upsertBillingProfile(
@@ -51,6 +90,7 @@ export async function upsertBillingProfile(
       card_summary_input: input.cardSummary ?? null,
       raw_response_input: input.rawResponse,
     })
+    .returns<BillingProfile>()
     .single();
 }
 
@@ -62,6 +102,7 @@ export async function fetchSubscriptionPlanDetail(
     .rpc("get_subscription_plan_detail", {
       plan_code_input: planCode,
     })
+    .returns<PlanDetail>()
     .single();
 }
 
@@ -71,7 +112,7 @@ export async function fetchDueSubscriptionsForBilling(
 ) {
   return supabase.rpc("get_due_subscriptions_for_billing", {
     cutoff,
-  });
+  }).returns<DueSubscription[]>();
 }
 
 export async function applyBillingChargeSuccess(
@@ -92,6 +133,7 @@ export async function applyBillingChargeSuccess(
       plan_code_input: input.planCode,
       provider_code_input: input.providerCode ?? "toss",
     })
+    .returns<PaymentResult>()
     .single();
 }
 
@@ -110,6 +152,7 @@ export async function applyBillingChargeFailure(
       plan_code_input: input.planCode,
       provider_code_input: input.providerCode ?? "toss",
     })
+    .returns<PaymentResult>()
     .single();
 }
 
@@ -122,5 +165,6 @@ export async function applyBillingKeyRevoked(
       customer_key_input: input.customerKey ?? null,
       billing_key_input: input.billingKey ?? null,
     })
+    .returns<BillingRevokeResult>()
     .single();
 }

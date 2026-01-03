@@ -8,6 +8,38 @@ type InsertPromptInput = {
   outputPrompt: string;
 };
 
+type PromptOutput = {
+  output_prompt: string;
+};
+
+type PromptInsertResult = {
+  id: string;
+  output_prompt: string;
+};
+
+type PromptListItem = {
+  id: string;
+  title: string;
+  platform_code: string;
+  output_prompt: string;
+  created_at: string;
+};
+
+type PromptDetail = {
+  id: string;
+  title: string;
+  template_id: string | null;
+  platform_code: string;
+  input_json: Record<string, unknown>;
+  output_prompt: string;
+  created_at: string;
+};
+
+type PromptTitleResult = {
+  id: string;
+  title: string;
+};
+
 export async function fetchPromptOutputForUser(
   supabase: SupabaseClient,
   promptId: string
@@ -16,6 +48,7 @@ export async function fetchPromptOutputForUser(
     .rpc("get_prompt_output", {
       prompt_id: promptId,
     })
+    .returns<PromptOutput>()
     .single();
 }
 
@@ -31,11 +64,12 @@ export async function insertPrompt(
       input_json: input.inputJson,
       output_prompt: input.outputPrompt,
     })
+    .returns<PromptInsertResult>()
     .single();
 }
 
 export async function fetchUserPrompts(supabase: SupabaseClient) {
-  return supabase.rpc("get_user_prompts");
+  return supabase.rpc("get_user_prompts").returns<PromptListItem[]>();
 }
 
 export async function fetchPromptDetailForUser(
@@ -46,6 +80,7 @@ export async function fetchPromptDetailForUser(
     .rpc("get_prompt_detail", {
       prompt_id: promptId,
     })
+    .returns<PromptDetail>()
     .single();
 }
 
@@ -68,6 +103,7 @@ export async function updatePromptTitleForUser(
       prompt_id: promptId,
       title_input: title,
     })
+    .returns<PromptTitleResult>()
     .single();
 }
 
@@ -81,5 +117,6 @@ export async function duplicatePromptForUser(
       prompt_id: promptId,
       title_input: title,
     })
+    .returns<PromptTitleResult>()
     .single();
 }
