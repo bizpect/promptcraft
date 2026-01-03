@@ -13,6 +13,14 @@ const schema = z.object({
   plan_code: z.enum(["pro", "max"]),
 });
 
+const planSchema = z.object({
+  plan_code: z.string().optional(),
+  plan_label: z.string().nullable().optional(),
+  price: z.number().int().nonnegative().optional(),
+  currency: z.string().optional(),
+  rewrite_limit: z.number().int().optional(),
+});
+
 export async function POST(request: Request) {
   const supabase = await createServerSupabase();
   const {
@@ -41,10 +49,18 @@ export async function POST(request: Request) {
     return errorResponse("plan_not_found", "플랜 정보를 찾을 수 없습니다.", 404);
   }
 
+  const parsedPlan = planSchema.safeParse(plan);
+
+  if (!parsedPlan.success) {
+    return errorResponse("plan_invalid", "플랜 정보가 올바르지 않습니다.", 500);
+  }
+
   const { clientKey } = getTossConfig();
   const orderId = `billing_auth_${plan_code}_${randomUUID()}`;
-  const orderName = `PromptCraft ${plan.plan_label ?? plan.plan_code}`;
-  const amount = plan.price ?? 0;
+  const orderName = `PromptCraft ${
+    parsedPlan.data.plan_label ?? parsedPlan.data.plan_code ?? plan_code
+  }`;
+  const amount = parsedPlan.data.price ?? 0;
   const { successUrl, failUrl } = getBillingRedirectUrls(plan_code, orderId);
 
   return NextResponse.json({
@@ -55,6 +71,6 @@ export async function POST(request: Request) {
     order_id: orderId,
     order_name: orderName,
     amount,
-    plan,
+    plan: parsedPlan.data,
   });
 }
