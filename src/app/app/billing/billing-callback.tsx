@@ -198,16 +198,16 @@ export function BillingCallback({
 
   const toneStyles =
     status.tone === "success"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+      ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
       : status.tone === "error"
-        ? "border-red-200 bg-red-50 text-red-900"
-        : "border-amber-200 bg-amber-50 text-amber-900";
+        ? "border-red-400/30 bg-red-500/10 text-red-100"
+        : "border-amber-400/30 bg-amber-500/10 text-amber-100";
 
   return (
     <div
       ref={bannerRef}
       role="alert"
-      className={`rounded-xl border p-4 text-sm font-medium ${toneStyles}`}
+      className={`rounded-2xl border p-4 text-sm font-medium ${toneStyles}`}
     >
       {status.message}
     </div>

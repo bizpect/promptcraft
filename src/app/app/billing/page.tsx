@@ -95,34 +95,39 @@ export default async function BillingPage({
   const cancelDaysLeft = formatDaysLeft(cancelAt);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold">결제/플랜</h1>
-        <p className="text-sm text-black/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+          Billing
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-white font-[var(--font-playfair)]">
+          결제/플랜
+        </h1>
+        <p className="text-sm text-white/60">
           현재 플랜과 결제 상태를 확인합니다.
         </p>
       </div>
 
-      <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="font-medium">현재 플랜: {planLabel}</p>
-            <div className="flex flex-wrap items-center gap-2 text-black/60">
+            <p className="font-medium text-white">현재 플랜: {planLabel}</p>
+            <div className="flex flex-wrap items-center gap-2 text-white/60">
               <span>상태: {statusLabel}</span>
               {cancelAt && (
-                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
+                <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-200">
                   해지 예약됨
                 </span>
               )}
             </div>
-            <p className="text-black/60">
+            <p className="text-white/60">
               리라이팅 {rewriteUsed}회 / {rewriteLimit}회
             </p>
-            <p className="text-black/60">
+            <p className="text-white/60">
               만료일: {formatDate(currentPeriodEnd)}
             </p>
             {cancelAt && (
-              <p className="text-xs text-black/60">
+              <p className="text-xs text-white/60">
                 {cancelDaysLeft !== null && cancelDaysLeft > 0
                   ? `해지 예정 · ${formatDate(cancelAt)} (D-${cancelDaysLeft})`
                   : "구독 만료됨"}
@@ -136,12 +141,12 @@ export default async function BillingPage({
             currentPlanCode={subscription?.plan_code ?? null}
           />
         </div>
-        <p className="mt-3 text-xs text-black/50">
+        <p className="mt-3 text-xs text-white/50">
           토스페이먼츠 정기결제는 테스트 키로 먼저 검증할 수 있습니다.
         </p>
         {subscription?.plan_code && subscription.plan_code !== "free" && (
-          <div className="mt-4 rounded-lg border border-black/5 bg-black/5 p-3 text-xs text-black/60">
-            <p className="font-medium text-black/80">해지 안내</p>
+          <div className="mt-4 rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/60">
+            <p className="font-medium text-white/80">해지 안내</p>
             <p className="mt-1">
               해지는 다음 결제일부터 반영되며, 만료일까지 모든 기능을 그대로
               이용할 수 있습니다.
@@ -168,9 +173,9 @@ export default async function BillingPage({
         mode={searchParams?.mode}
       />
 
-      <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
-        <p className="font-medium">구독 시작</p>
-        <p className="mt-1 text-xs text-black/60">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+        <p className="font-medium text-white">구독 시작</p>
+        <p className="mt-1 text-xs text-white/60">
           테스트 결제는 토스 결제창에서 카드 등록 후 진행됩니다.
         </p>
         <div className="mt-4">
@@ -181,17 +186,17 @@ export default async function BillingPage({
         </div>
       </div>
 
-      <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
         <div className="flex items-center justify-between">
-          <p className="font-medium">결제 내역</p>
+          <p className="font-medium text-white">결제 내역</p>
           {hasLatestFailure && (
-            <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-700">
+            <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs text-red-200">
               최근 결제 실패: {latestStatusLabel ?? "실패"}
             </span>
           )}
         </div>
         {canRetry && (
-          <p className="mt-2 text-xs text-amber-700">
+          <p className="mt-2 text-xs text-amber-200">
             자동으로 다시 시도합니다. 실패가 반복되면 구독이 비활성화될 수
             있습니다.
           </p>
@@ -202,27 +207,27 @@ export default async function BillingPage({
               const paymentDate = payment.approved_at ?? payment.created_at;
               const statusTone =
                 payment.status_code === "paid"
-                  ? "text-emerald-700"
+                  ? "text-emerald-200"
                   : payment.status_code === "failed" ||
                       payment.status_code === "canceled"
-                    ? "text-red-700"
-                    : "text-black/60";
+                    ? "text-red-200"
+                    : "text-white/60";
 
               return (
                 <div
                   key={payment.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-black/5 bg-black/5 p-3"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/40 p-3"
                 >
                   <div>
-                    <p className="font-medium">
+                    <p className="font-medium text-white">
                       {payment.provider_label ?? payment.provider_code ?? "결제"}
                     </p>
-                    <p className="text-xs text-black/50">
+                    <p className="text-xs text-white/50">
                       {payment.order_id ?? "-"} · {formatDate(paymentDate)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">
+                    <p className="font-medium text-white">
                       {formatAmount(payment.amount, payment.currency)}
                     </p>
                     <p className={`text-xs ${statusTone}`}>
@@ -233,12 +238,12 @@ export default async function BillingPage({
               );
             })
           ) : (
-            <p className="text-xs text-black/50">
+            <p className="text-xs text-white/50">
               아직 결제 내역이 없습니다.
             </p>
           )}
         </div>
-        <p className="mt-3 text-xs text-black/50">
+        <p className="mt-3 text-xs text-white/50">
           최근 5건만 표시됩니다.
         </p>
       </div>

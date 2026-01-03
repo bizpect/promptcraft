@@ -51,13 +51,13 @@ export function PromptList({ prompts }: PromptListProps) {
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
         <input
-          className="h-10 rounded-md border border-black/10 px-3 text-sm"
+          className="h-11 rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-sm text-white/80"
           placeholder="제목 또는 프롬프트로 검색"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
         <select
-          className="h-10 rounded-md border border-black/10 px-3 text-sm"
+          className="h-11 rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-sm text-white/80"
           value={platform}
           onChange={(event) =>
             setPlatform(event.target.value as "all" | "sora" | "veo")
@@ -74,12 +74,12 @@ export function PromptList({ prompts }: PromptListProps) {
           {filtered.map((prompt) => (
             <div
               key={prompt.id}
-              className="rounded-xl border border-black/10 bg-white p-5 text-sm"
+              className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm transition duration-300 hover:-translate-y-1 hover:border-white/30"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="font-medium">{prompt.title}</p>
-                  <p className="text-xs text-black/50">
+                  <p className="font-medium text-white">{prompt.title}</p>
+                  <p className="text-xs text-white/50">
                     {prompt.platform_code.toUpperCase()} ·{" "}
                     {formatDate(prompt.created_at)}
                   </p>
@@ -91,12 +91,12 @@ export function PromptList({ prompts }: PromptListProps) {
                   보기
                 </Link>
               </div>
-              <p className="mt-3 text-black/70">{prompt.output_prompt}</p>
+              <p className="mt-3 text-white/70">{prompt.output_prompt}</p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-black/60">검색 결과가 없습니다.</p>
+        <p className="text-sm text-white/60">검색 결과가 없습니다.</p>
       )}
     </div>
   );

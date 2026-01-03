@@ -158,25 +158,25 @@ export function BillingActions({
       <Script src={scriptSrc} strategy="afterInteractive" />
 
       {isMaxActive ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-          <p className="font-medium">Max 플랜을 이용 중입니다.</p>
-          <p className="mt-1 text-emerald-900/70">
+        <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+          <p className="font-medium text-emerald-100">Max 플랜을 이용 중입니다.</p>
+          <p className="mt-1 text-emerald-100/70">
             현재 플랜이 최고 등급이라 추가 결제 옵션이 없습니다.
           </p>
         </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
-          <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
             <div className="flex items-center justify-between">
-              <p className="font-medium">Pro</p>
+              <p className="font-medium text-white">Pro</p>
               {isProActive && (
-                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs text-black/70">
+                <span className="rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-xs text-white/70">
                   현재 이용 중
                 </span>
               )}
             </div>
-            <p className="mt-1 text-black/60">리라이팅 20회/월</p>
-            <p className="mt-2 text-lg font-semibold">
+            <p className="mt-1 text-white/60">리라이팅 20회/월</p>
+            <p className="mt-2 text-lg font-semibold text-white">
               {formatPrice(4900, "KRW")} / 월
             </p>
             <Button
@@ -189,17 +189,17 @@ export function BillingActions({
             </Button>
           </div>
 
-          <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
             <div className="flex items-center justify-between">
-              <p className="font-medium">Max</p>
+              <p className="font-medium text-white">Max</p>
               {isActive && (
-                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs text-black/70">
+                <span className="rounded-full border border-white/10 bg-black/40 px-2 py-0.5 text-xs text-white/70">
                   업그레이드
                 </span>
               )}
             </div>
-            <p className="mt-1 text-black/60">리라이팅 100회/월</p>
-            <p className="mt-2 text-lg font-semibold">
+            <p className="mt-1 text-white/60">리라이팅 100회/월</p>
+            <p className="mt-2 text-lg font-semibold text-white">
               {formatPrice(9900, "KRW")} / 월
             </p>
             <Button
@@ -216,7 +216,7 @@ export function BillingActions({
         </div>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-300">{error}</p>}
       <LoadingOverlay show={loadingPlan !== null} />
     </div>
   );

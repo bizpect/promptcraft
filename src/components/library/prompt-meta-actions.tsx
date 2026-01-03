@@ -77,11 +77,11 @@ export function PromptMetaActions({
   };
 
   return (
-    <div className="rounded-xl border border-black/10 bg-white p-5 text-sm">
-      <p className="font-medium">프롬프트 제목</p>
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+      <p className="font-medium text-white">프롬프트 제목</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <input
-          className="h-10 flex-1 rounded-md border border-black/10 px-3"
+          className="h-11 flex-1 rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-white/80"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="제목을 입력하세요"
@@ -99,8 +99,8 @@ export function PromptMetaActions({
           복제
         </Button>
       </div>
-      {success && <p className="mt-2 text-green-600">{success}</p>}
-      {error && <p className="mt-2 text-red-600">{error}</p>}
+      {success && <p className="mt-2 text-emerald-300">{success}</p>}
+      {error && <p className="mt-2 text-red-300">{error}</p>}
     </div>
   );
 }

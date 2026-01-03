@@ -5,8 +5,8 @@ type ErrorStateProps = {
 
 export function ErrorState({ title, body }: ErrorStateProps) {
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-      <p className="font-medium">{title}</p>
+    <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-100">
+      <p className="font-medium text-red-100">{title}</p>
       {body && <p className="mt-2">{body}</p>}
     </div>
   );

@@ -86,7 +86,7 @@ export function RewriteHistory({ promptId, rewrites }: RewriteHistoryProps) {
 
   if (rewrites.length === 0) {
     return (
-      <p className="mt-2 text-black/60">아직 리라이팅 히스토리가 없습니다.</p>
+      <p className="mt-2 text-white/60">아직 리라이팅 히스토리가 없습니다.</p>
     );
   }
 
@@ -97,12 +97,12 @@ export function RewriteHistory({ promptId, rewrites }: RewriteHistoryProps) {
           {selectedItems.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg border border-black/10 bg-black/5 p-3 text-xs"
+              className="rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/70"
             >
               <p className="font-medium">
                 {item.provider_code.toUpperCase()} · {formatDate(item.created_at)}
               </p>
-              <p className="mt-2 whitespace-pre-wrap text-black/70">
+              <p className="mt-2 whitespace-pre-wrap text-white/70">
                 {item.rewritten_prompt}
               </p>
             </div>
@@ -114,10 +114,10 @@ export function RewriteHistory({ promptId, rewrites }: RewriteHistoryProps) {
         {rewrites.map((rewrite) => (
           <div
             key={rewrite.id}
-            className="rounded-lg border border-black/10 bg-white p-3 text-sm"
+            className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-black/50">
+              <p className="text-xs text-white/50">
                 {rewrite.provider_code.toUpperCase()} ·{" "}
                 {formatDate(rewrite.created_at)}
               </p>
@@ -146,14 +146,14 @@ export function RewriteHistory({ promptId, rewrites }: RewriteHistoryProps) {
                 </Button>
               </div>
             </div>
-            <p className="mt-2 whitespace-pre-wrap text-black/70">
+            <p className="mt-2 whitespace-pre-wrap text-white/70">
               {rewrite.rewritten_prompt}
             </p>
           </div>
         ))}
       </div>
 
-      {message && <p className="text-xs text-black/60">{message}</p>}
+      {message && <p className="text-xs text-white/60">{message}</p>}
       <LoadingOverlay show={applyLoading !== null} />
     </div>
   );

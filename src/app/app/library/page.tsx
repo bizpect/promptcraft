@@ -13,10 +13,15 @@ export default async function LibraryPage() {
   const hasPrompts = promptList.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold">프롬프트 라이브러리</h1>
-        <p className="text-sm text-black/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+          Library
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-white font-[var(--font-playfair)]">
+          프롬프트 라이브러리
+        </h1>
+        <p className="text-sm text-white/60">
           저장된 프롬프트를 관리합니다.
         </p>
       </div>

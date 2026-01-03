@@ -226,33 +226,38 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold">프로필 설정</h1>
-        <p className="text-sm text-black/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+          Profile
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-white font-[var(--font-playfair)]">
+          프로필 설정
+        </h1>
+        <p className="text-sm text-white/60">
           표시 이름과 프로필 이미지를 관리합니다.
         </p>
       </div>
 
       <form
         onSubmit={handleSave}
-        className="space-y-4 rounded-xl border border-black/10 bg-white p-5 text-sm"
+        className="space-y-5 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm"
       >
         <div className="space-y-2">
-          <label className="text-sm font-medium">이메일</label>
-          <p className="text-black/70">{profile?.email ?? "미설정"}</p>
+          <label className="text-sm font-medium text-white">이메일</label>
+          <p className="text-white/70">{profile?.email ?? "미설정"}</p>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">프로필 이미지</label>
+          <label className="text-sm font-medium text-white">프로필 이미지</label>
           {avatarPreviewUrl || avatarUrl ? (
             <img
               src={avatarPreviewUrl ?? avatarDisplayUrl}
               alt="프로필 이미지"
-              className="h-16 w-16 rounded-full border border-black/10 object-cover"
+              className="h-16 w-16 rounded-full border border-white/10 object-cover"
             />
           ) : (
-            <p className="text-black/60">등록된 이미지가 없습니다.</p>
+            <p className="text-white/60">등록된 이미지가 없습니다.</p>
           )}
           <div className="flex flex-wrap items-center gap-3">
             <input
@@ -260,7 +265,7 @@ export default function ProfilePage() {
               accept="image/jpeg,image/png,image/webp"
               onChange={handleAvatarUpload}
               disabled={uploading || removing}
-              className="text-sm"
+              className="text-sm text-white/70"
             />
             <Button
               type="button"
@@ -272,19 +277,19 @@ export default function ProfilePage() {
               이미지 삭제
             </Button>
           </div>
-          <p className="text-xs text-black/50">
+          <p className="text-xs text-white/50">
             JPG/PNG/WEBP, {maxUploadMb}MB 이하. 업로드 시 자동 리사이즈됩니다.
           </p>
           {uploading && <LoadingSpinner size={16} />}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium" htmlFor="displayName">
+          <label className="text-sm font-medium text-white" htmlFor="displayName">
             표시 이름
           </label>
           <input
             id="displayName"
-            className="h-10 w-full rounded-md border border-black/10 px-3"
+            className="h-11 w-full rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-white/80"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
             placeholder="이름을 입력하세요"
@@ -292,12 +297,12 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium" htmlFor="avatarUrl">
+          <label className="text-sm font-medium text-white" htmlFor="avatarUrl">
             프로필 이미지 URL
           </label>
           <input
             id="avatarUrl"
-            className="h-10 w-full rounded-md border border-black/10 px-3"
+            className="h-11 w-full rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-white/80"
             value={avatarUrl}
             onChange={(event) => setAvatarUrl(event.target.value)}
             placeholder="https://"
@@ -309,8 +314,8 @@ export default function ProfilePage() {
           저장
         </Button>
 
-        {success && <p className="text-green-600">{success}</p>}
-        {error && <p className="text-red-600">{error}</p>}
+        {success && <p className="text-emerald-300">{success}</p>}
+        {error && <p className="text-red-300">{error}</p>}
       </form>
       <LoadingOverlay show={saving || uploading || removing} />
     </div>

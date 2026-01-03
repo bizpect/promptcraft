@@ -142,17 +142,17 @@ export function PaymentMethodActions({
   }
 
   return (
-    <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
       <Script src={scriptSrc} strategy="afterInteractive" />
-      <p className="font-medium">결제수단 변경</p>
-      <p className="mt-1 text-xs text-black/60">
+      <p className="font-medium text-white">결제수단 변경</p>
+      <p className="mt-1 text-xs text-white/60">
         다음 결제부터 새 카드로 결제됩니다.
       </p>
       <Button className="mt-3" onClick={startUpdate} disabled={loading}>
         {loading && <LoadingSpinner size={16} />}
         결제수단 변경
       </Button>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-red-300">{error}</p>}
       <LoadingOverlay show={loading} />
     </div>
   );

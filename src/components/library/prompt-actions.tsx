@@ -73,7 +73,7 @@ export function PromptActions({ promptId, platformCode }: PromptActionsProps) {
   };
 
   return (
-    <div className="space-y-4 rounded-xl border border-black/10 bg-white p-5 text-sm">
+    <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
       <div className="flex flex-wrap gap-2">
         <Button onClick={handleRewrite} disabled={rewriteLoading}>
           {rewriteLoading && <LoadingSpinner size={16} />}
@@ -90,13 +90,13 @@ export function PromptActions({ promptId, platformCode }: PromptActionsProps) {
       </div>
 
       {rewriteResult && (
-        <div className="rounded-lg border border-black/10 bg-black/5 p-4 text-sm whitespace-pre-wrap">
+        <div className="rounded-xl border border-white/10 bg-black/40 p-4 text-sm whitespace-pre-wrap text-white/70">
           {rewriteResult}
         </div>
       )}
 
-      {rewriteError && <p className="text-red-600">{rewriteError}</p>}
-      {deleteError && <p className="text-red-600">{deleteError}</p>}
+      {rewriteError && <p className="text-red-300">{rewriteError}</p>}
+      {deleteError && <p className="text-red-300">{deleteError}</p>}
       <LoadingOverlay show={rewriteLoading || deleteLoading} />
     </div>
   );

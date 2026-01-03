@@ -27,7 +27,7 @@ export function UserMenu({ email }: UserMenuProps) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-black/60">{email ?? "로그인됨"}</span>
+      <span className="text-sm text-white/60">{email ?? "로그인됨"}</span>
       <button
         type="button"
         onClick={handleSignOut}

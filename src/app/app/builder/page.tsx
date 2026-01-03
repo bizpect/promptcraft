@@ -99,7 +99,7 @@ function renderInputFields(input: {
 
   if (keys.length === 0) {
     return (
-      <p className="text-xs text-black/50">
+      <p className="text-xs text-white/50">
         템플릿에 입력 키가 없습니다.
       </p>
     );
@@ -112,17 +112,17 @@ function renderInputFields(input: {
         const isTextarea = TEXTAREA_KEYS.has(key);
 
         return (
-          <label key={key} className="grid gap-2 text-xs text-black/60">
-            <span className="text-sm font-medium text-black/80">{label}</span>
+          <label key={key} className="grid gap-2 text-xs text-white/60">
+            <span className="text-sm font-medium text-white/80">{label}</span>
             {isTextarea ? (
               <textarea
-                className="min-h-[70px] rounded-md border border-black/10 px-3 py-2 text-sm text-black"
+                className="min-h-[70px] rounded-xl border border-white/10 bg-[var(--surface)] px-3 py-2 text-sm text-white/80"
                 placeholder={key}
                 {...input.register(`inputs.${key}`)}
               />
             ) : (
               <input
-                className="h-10 rounded-md border border-black/10 px-3 text-sm text-black"
+                className="h-10 rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-sm text-white/80"
                 placeholder={key}
                 {...input.register(`inputs.${key}`)}
               />
@@ -315,39 +315,44 @@ export default function BuilderPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold">프롬프트 빌더</h1>
-        <p className="text-sm text-black/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+          Builder
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-white font-[var(--font-playfair)]">
+          프롬프트 빌더
+        </h1>
+        <p className="text-sm text-white/60">
           템플릿을 고르고 입력 값을 채우면 프롬프트가 생성됩니다.
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
-          <p className="font-medium">내 프로필</p>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+          <p className="font-medium text-white">내 프로필</p>
           {profileLoading ? (
             <div className="mt-2">
               <LoadingSpinner size={18} />
             </div>
           ) : profile ? (
-            <div className="mt-2 space-y-1 text-black/70">
+            <div className="mt-2 space-y-1 text-white/70">
               <p>이름: {profile.display_name ?? "미설정"}</p>
               <p>이메일: {profile.email ?? "미설정"}</p>
             </div>
           ) : (
-            <p className="mt-1 text-red-600">{profileError ?? "조회 실패"}</p>
+            <p className="mt-1 text-red-300">{profileError ?? "조회 실패"}</p>
           )}
         </div>
 
-        <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
-          <p className="font-medium">리라이팅 한도</p>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+          <p className="font-medium text-white">리라이팅 한도</p>
           {subscriptionLoading ? (
             <div className="mt-2">
               <LoadingSpinner size={18} />
             </div>
           ) : subscription ? (
-            <div className="mt-2 space-y-1 text-black/70">
+            <div className="mt-2 space-y-1 text-white/70">
               <p>
                 플랜:{" "}
                 {subscription.plan_label ??
@@ -364,18 +369,18 @@ export default function BuilderPage() {
               </p>
             </div>
           ) : (
-            <p className="mt-1 text-red-600">
+            <p className="mt-1 text-red-300">
               {subscriptionError ?? "조회 실패"}
             </p>
           )}
         </div>
       </div>
 
-      <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="grid gap-5" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
-          <label className="text-sm font-medium">플랫폼</label>
+          <label className="text-sm font-medium text-white">플랫폼</label>
           <select
-            className="h-10 rounded-md border border-black/10 px-3"
+            className="h-11 rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-white/80"
             {...register("platform")}
           >
             <option value="sora">Sora</option>
@@ -384,9 +389,9 @@ export default function BuilderPage() {
         </div>
 
         <div className="grid gap-2">
-          <label className="text-sm font-medium">템플릿</label>
+          <label className="text-sm font-medium text-white">템플릿</label>
           <select
-            className="h-10 rounded-md border border-black/10 px-3"
+            className="h-11 rounded-xl border border-white/10 bg-[var(--surface)] px-3 text-white/80"
             {...register("templateId")}
           >
             <option value="">
@@ -404,15 +409,15 @@ export default function BuilderPage() {
             </div>
           )}
           {selectedTemplate?.description && (
-            <p className="text-xs text-black/60">
+            <p className="text-xs text-white/60">
               {selectedTemplate.description}
             </p>
           )}
           {templatesError && (
-            <p className="text-xs text-red-600">{templatesError}</p>
+            <p className="text-xs text-red-300">{templatesError}</p>
           )}
           {errors.templateId && (
-            <p className="text-xs text-red-600">
+            <p className="text-xs text-red-300">
               {errors.templateId.message}
             </p>
           )}
@@ -420,9 +425,9 @@ export default function BuilderPage() {
 
         {selectedTemplate ? (
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-3 rounded-xl border border-black/10 bg-white p-4 text-sm">
-              <p className="font-medium">입력 필드</p>
-              <p className="text-xs text-black/60">
+            <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+              <p className="font-medium text-white">입력 필드</p>
+              <p className="text-xs text-white/60">
                 템플릿에 포함된 키가 자동으로 표시됩니다.
               </p>
               {renderInputFields({
@@ -432,12 +437,12 @@ export default function BuilderPage() {
               })}
             </div>
 
-            <div className="rounded-xl border border-black/10 bg-white p-4 text-sm">
-              <p className="font-medium">실시간 미리보기</p>
-              <p className="mt-1 text-xs text-black/60">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
+              <p className="font-medium text-white">실시간 미리보기</p>
+              <p className="mt-1 text-xs text-white/60">
                 입력값이 즉시 반영됩니다.
               </p>
-              <pre className="mt-3 whitespace-pre-wrap text-black/70">
+              <pre className="mt-3 whitespace-pre-wrap text-white/70">
                 {buildPreview({
                   platform: selectedPlatform,
                   basePrompt: selectedTemplate.base_prompt,
@@ -447,7 +452,7 @@ export default function BuilderPage() {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-black/60">
+          <p className="text-xs text-white/60">
             템플릿을 선택하면 입력 필드가 표시됩니다.
           </p>
         )}
@@ -459,7 +464,7 @@ export default function BuilderPage() {
       </form>
 
       {result && (
-        <div className="rounded-xl border border-black/10 bg-black/5 p-4 text-sm whitespace-pre-wrap">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm whitespace-pre-wrap text-white/70">
           {result}
         </div>
       )}
