@@ -35,7 +35,6 @@ export default async function LibraryPage() {
         />
       )}
 
-      <Button variant="outline">템플릿 관리 (준비중)</Button>
     </div>
   );
 }
