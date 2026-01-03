@@ -29,7 +29,10 @@ export async function POST() {
   }
 
   try {
-    await revokeTossBillingKey({ billingKey: billingProfile.billing_key });
+    await revokeTossBillingKey({
+      billingKey: billingProfile.billing_key,
+      customerKey: billingProfile.customer_key ?? undefined,
+    });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "빌링키 해지에 실패했습니다.";
