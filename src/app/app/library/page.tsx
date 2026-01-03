@@ -11,6 +11,12 @@ export default async function LibraryPage() {
   const { data: prompts, error } = await fetchUserPrompts(supabase);
   const promptList = ensureArray(prompts);
   const hasPrompts = promptList.length > 0;
+  const safePrompts = promptList.map((prompt) => ({
+    id: prompt.id,
+    title: prompt.title,
+    platform_code: prompt.platform_code,
+    created_at: prompt.created_at,
+  }));
 
   return (
     <div className="space-y-8">
@@ -32,7 +38,7 @@ export default async function LibraryPage() {
           body="잠시 후 다시 시도해주세요."
         />
       ) : hasPrompts ? (
-        <PromptList prompts={promptList} />
+        <PromptList prompts={safePrompts} />
       ) : (
         <EmptyState
           title="아직 저장된 프롬프트가 없습니다."

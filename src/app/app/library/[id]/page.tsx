@@ -8,6 +8,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { fetchPromptDetailForUser, fetchRewritesForPrompt } from "@/lib/db";
 import { ensureArray } from "@/lib/db/repositories/guards";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getFieldLabel } from "@/lib/templates/fields";
 
 function formatDate(value: string) {
   const date = new Date(value);
@@ -15,6 +16,23 @@ function formatDate(value: string) {
     return value;
   }
   return date.toLocaleString("ko-KR");
+}
+
+function formatValue(value: unknown) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  if (typeof value === "string") {
+    return value.trim();
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
 }
 
 export default async function LibraryDetailPage({
@@ -27,6 +45,13 @@ export default async function LibraryDetailPage({
   const { data: prompt } = await fetchPromptDetailForUser(supabase, id);
   const { data: rewrites } = await fetchRewritesForPrompt(supabase, id);
   const rewriteList = ensureArray(rewrites);
+  const inputEntries = Object.entries(prompt?.input_json ?? {})
+    .filter(([key, value]) => key !== "platform" && formatValue(value))
+    .map(([key, value]) => ({
+      key,
+      label: getFieldLabel(key),
+      value: formatValue(value),
+    }));
 
   if (!prompt) {
     return (
@@ -67,10 +92,28 @@ export default async function LibraryDetailPage({
       <PromptMetaActions promptId={prompt.id} initialTitle={prompt.title} />
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">
-        <p className="font-medium text-white">출력 프롬프트</p>
-        <p className="mt-3 whitespace-pre-wrap text-white/70">
-          {prompt.output_prompt}
-        </p>
+        <p className="font-medium text-white">입력 요약</p>
+        {inputEntries.length > 0 ? (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {inputEntries.map((entry) => (
+              <div
+                key={entry.key}
+                className="rounded-xl border border-white/10 bg-black/40 p-4"
+              >
+                <p className="text-xs uppercase tracking-[0.28em] text-white/50">
+                  {entry.label}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-white/80">
+                  {entry.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-white/60">
+            저장된 입력 정보가 없습니다.
+          </p>
+        )}
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm">

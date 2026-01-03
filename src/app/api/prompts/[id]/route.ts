@@ -48,7 +48,8 @@ export async function GET(
     return errorResponse("prompt_not_found", "프롬프트를 찾을 수 없습니다.", 404);
   }
 
-  return NextResponse.json({ prompt });
+  const { output_prompt: _outputPrompt, ...safePrompt } = prompt;
+  return NextResponse.json({ prompt: safePrompt });
 }
 
 export async function PATCH(

@@ -52,5 +52,5 @@ export async function PATCH(
     return errorResponse("update_failed", "수정에 실패했습니다.", 500);
   }
 
-  return NextResponse.json({ prompt });
+  return NextResponse.json({ ok: true, prompt_id: prompt.id });
 }

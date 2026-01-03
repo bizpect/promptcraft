@@ -65,5 +65,5 @@ export async function POST(request: Request) {
     return errorResponse("insert_failed", "저장에 실패했습니다.", 500);
   }
 
-  return NextResponse.json(createdPrompt);
+  return NextResponse.json({ ok: true, prompt_id: createdPrompt.id });
 }

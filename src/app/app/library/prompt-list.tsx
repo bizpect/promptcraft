@@ -9,7 +9,6 @@ type PromptListItem = {
   id: string;
   title: string;
   platform_code: "sora" | "veo";
-  output_prompt: string;
   created_at: string;
 };
 
@@ -41,8 +40,7 @@ export function PromptList({ prompts }: PromptListProps) {
         return true;
       }
       return (
-        prompt.title.toLowerCase().includes(normalized) ||
-        prompt.output_prompt.toLowerCase().includes(normalized)
+        prompt.title.toLowerCase().includes(normalized)
       );
     });
   }, [platform, prompts, query]);
@@ -91,7 +89,9 @@ export function PromptList({ prompts }: PromptListProps) {
                   보기
                 </Link>
               </div>
-              <p className="mt-3 text-white/70">{prompt.output_prompt}</p>
+              <p className="mt-3 text-xs text-white/50">
+                저장됨 · 상세보기에서 입력 요약 확인
+              </p>
             </div>
           ))}
         </div>
