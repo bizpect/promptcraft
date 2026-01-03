@@ -463,11 +463,6 @@ export default function BuilderPage() {
         </Button>
       </form>
 
-      {result && (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm whitespace-pre-wrap text-white/70">
-          {result}
-        </div>
-      )}
       <LoadingOverlay
         show={loading || profileLoading || subscriptionLoading || templatesLoading}
       />
