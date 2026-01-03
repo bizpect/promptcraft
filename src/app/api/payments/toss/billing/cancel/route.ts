@@ -35,9 +35,6 @@ export async function POST() {
     });
   } catch (error) {
     logSupabaseError("billing.revoke_failed", error);
-    const message =
-      error instanceof Error ? error.message : "빌링키 해지에 실패했습니다.";
-    return errorResponse("billing_revoke_failed", message, 502);
   }
 
   const { error: cancelError } = await scheduleSubscriptionCancel(supabase);
