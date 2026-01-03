@@ -1,22 +1,30 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type {
+  PostgrestMaybeSingleResponse,
+  PostgrestResponse,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 
-type SubscriptionCore = {
+export type SubscriptionCore = {
   plan_code: string;
   status_code: string;
   rewrite_used: number;
   rewrite_limit: number;
 };
 
-type SubscriptionWithLabels = SubscriptionCore & {
+export type SubscriptionWithLabels = SubscriptionCore & {
   plan_label: string | null;
   status_label: string | null;
 };
 
-export async function fetchSubscriptionForUser(supabase: SupabaseClient) {
+export async function fetchSubscriptionForUser(
+  supabase: SupabaseClient
+): Promise<PostgrestMaybeSingleResponse<SubscriptionCore>> {
   return supabase.rpc("get_subscription").returns<SubscriptionCore>().maybeSingle();
 }
 
-export async function fetchSubscriptionWithLabels(supabase: SupabaseClient) {
+export async function fetchSubscriptionWithLabels(
+  supabase: SupabaseClient
+): Promise<PostgrestMaybeSingleResponse<SubscriptionWithLabels>> {
   return supabase
     .rpc("get_subscription_with_labels")
     .returns<SubscriptionWithLabels>()
@@ -26,7 +34,7 @@ export async function fetchSubscriptionWithLabels(supabase: SupabaseClient) {
 export async function updateSubscriptionRewriteUsed(
   supabase: SupabaseClient,
   rewriteUsed: number
-) {
+): Promise<PostgrestResponse<null>> {
   return supabase.rpc("update_subscription_rewrite_used", {
     new_value: rewriteUsed,
   });
