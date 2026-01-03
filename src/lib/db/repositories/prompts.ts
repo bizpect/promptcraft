@@ -5,7 +5,6 @@ import type {
 } from "@supabase/supabase-js";
 
 import type { RpcArrayResult } from "@/lib/db/repositories/types";
-
 type InsertPromptInput = {
   templateId: string;
   platformCode: string;
@@ -76,7 +75,7 @@ export async function insertPrompt(
 
 export async function fetchUserPrompts(
   supabase: SupabaseClient
-): Promise<PostgrestResponse<RpcArrayResult<PromptListItem>>> {
+): Promise<PostgrestSingleResponse<RpcArrayResult<PromptListItem>>> {
   return supabase.rpc("get_user_prompts").returns<PromptListItem[]>();
 }
 

@@ -1,4 +1,7 @@
-import type { PostgrestResponse, SupabaseClient } from "@supabase/supabase-js";
+import type {
+  PostgrestSingleResponse,
+  SupabaseClient,
+} from "@supabase/supabase-js";
 
 import type { RpcArrayResult } from "@/lib/db/repositories/types";
 
@@ -40,7 +43,7 @@ export async function insertRewrite(
 export async function fetchRewritesForPrompt(
   supabase: SupabaseClient,
   promptId: string
-): Promise<PostgrestResponse<RpcArrayResult<RewriteListItem>>> {
+): Promise<PostgrestSingleResponse<RpcArrayResult<RewriteListItem>>> {
   return supabase.rpc("get_rewrites_for_prompt", {
     prompt_id: promptId,
   }).returns<RewriteListItem[]>();
