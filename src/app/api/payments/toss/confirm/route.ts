@@ -17,6 +17,11 @@ const schema = z.object({
   plan_code: z.string().min(1),
 });
 
+const appliedPaymentSchema = z.object({
+  payment_id: z.string().uuid().optional(),
+  status_code: z.string().optional(),
+});
+
 function isPaidStatus(status: string | undefined) {
   if (!status) {
     return false;
@@ -122,10 +127,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const paymentId =
-    typeof appliedPayment.payment_id === "string"
-      ? appliedPayment.payment_id
-      : null;
+  const parsedApplied = appliedPaymentSchema.safeParse(appliedPayment);
+
+  if (!parsedApplied.success) {
+    return errorResponse(
+      "payment_apply_invalid",
+      "결제 반영 정보가 올바르지 않습니다.",
+      500
+    );
+  }
+
+  const paymentId = parsedApplied.data.payment_id ?? null;
 
   if (paymentId) {
     const { error: eventError } = await createPaymentEvent(supabase, {
@@ -142,6 +154,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     payment_id: paymentId,
-    status: appliedPayment.status_code ?? "paid",
+    status: parsedApplied.data.status_code ?? "paid",
   });
 }
