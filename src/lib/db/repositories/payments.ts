@@ -1,4 +1,9 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type {
+  PostgrestSingleResponse,
+  SupabaseClient,
+} from "@supabase/supabase-js";
+
+import type { RpcArrayResult } from "@/lib/db/repositories/types";
 
 type PaymentConfirmationInput = {
   orderId: string;
@@ -115,6 +120,8 @@ export async function createPaymentEvent(
   });
 }
 
-export async function fetchUserPayments(supabase: SupabaseClient) {
+export async function fetchUserPayments(
+  supabase: SupabaseClient
+): Promise<PostgrestSingleResponse<RpcArrayResult<UserPayment>>> {
   return supabase.rpc("get_user_payments").returns<UserPayment[]>();
 }

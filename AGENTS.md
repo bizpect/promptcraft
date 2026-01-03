@@ -21,6 +21,7 @@
 - 재사용 가능한 로직은 반드시 공통 유틸/헬퍼로 승격(중복 금지).
 - 테이블별 코드값(상태, 타입, 분류 등)은 개별 테이블에 흩뿌리지 않고 공통 코드 테이블로 정의해 참조하기.
 - 모든 DB 접근은 RPC로만 처리하고, 모든 RPC는 RLS 정책을 준수해야 한다.
+- RPC에서 배열을 반환할 때는 `RpcArrayResult` + `normalizeRpcArray`로 안전하게 처리해 타입 불일치를 방지한다.
 - 네이밍: 팩토리는 `createServerSupabase`, `createBrowserSupabase` 형태, repo는 `fetch*`/`insert*`.
 - 문제 해결은 임시방편보다 근본 원인부터 확인하고 구조적으로 해결한다.
 

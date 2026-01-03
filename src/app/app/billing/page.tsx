@@ -1,4 +1,5 @@
 import { fetchSubscriptionWithLabels, fetchUserPayments } from "@/lib/db";
+import { normalizeRpcArray } from "@/lib/db/repositories/types";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 import { BillingActions } from "@/app/app/billing/billing-actions";
@@ -24,7 +25,7 @@ export default async function BillingPage({
 }) {
   const supabase = await createServerSupabase();
   const { data: subscription } = await fetchSubscriptionWithLabels(supabase);
-  const { data: payments } = await fetchUserPayments(supabase);
+  const { data: paymentsData } = await fetchUserPayments(supabase);
 
   const planLabel =
     subscription?.plan_label ?? subscription?.plan_code ?? "알 수 없음";
@@ -38,7 +39,8 @@ export default async function BillingPage({
   const planCode = searchParams?.plan;
   const result = searchParams?.result;
   const orderId = searchParams?.orderId;
-  const latestPayment = payments?.[0] ?? null;
+  const payments = normalizeRpcArray(paymentsData);
+  const latestPayment = payments[0] ?? null;
   const latestStatusCode = latestPayment?.status_code ?? null;
   const latestStatusLabel = latestPayment?.status_label ?? latestStatusCode;
   const hasLatestFailure =
@@ -132,7 +134,7 @@ export default async function BillingPage({
           )}
         </div>
         <div className="mt-3 space-y-3">
-          {payments && payments.length > 0 ? (
+          {payments.length > 0 ? (
             payments.slice(0, 5).map((payment) => {
               const paymentDate = payment.approved_at ?? payment.created_at;
               const statusTone =
